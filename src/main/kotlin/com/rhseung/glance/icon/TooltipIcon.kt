@@ -9,5 +9,7 @@ class TooltipIcon(name: String, variants: Int = 1) : Icon(variants) {
     companion object {
         val HUNGER = TooltipIcon("hunger", 2);
         val SATURATION = TooltipIcon("saturation", 4);
+        val FUEL = TooltipIcon("fuel");
+        val DURABILITY = TooltipIcon("durability");
     }
 }

@@ -5,7 +5,7 @@ import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.registry.entry.RegistryEntry
 
-class AttributeIcon(private val name: String, variants: Int = 1) : Icon(variants) {
+class AttributeIcon(private val name: String, variants: Int = 1) : Icon(variants, 9, 9) {
     override val id = ModMain.of("textures/icon/attribute/$name.png");
 
     fun toAttribute() = when (this) {

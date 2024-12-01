@@ -14,13 +14,13 @@ class Color {
     val V: Float
 
     constructor(R: Int, G: Int, B: Int) {
-        this.R = R
-        this.G = G
-        this.B = B
+        this.R = R.coerceIn(0, 255)
+        this.G = G.coerceIn(0, 255)
+        this.B = B.coerceIn(0, 255)
 
-        val r = R / 255.0F
-        val g = G / 255.0F
-        val b = B / 255.0F
+        val r = this.R / 255.0F
+        val g = this.G / 255.0F
+        val b = this.B / 255.0F
 
         val max = maxOf(r, g, b)
         val min = minOf(r, g, b)
@@ -42,48 +42,48 @@ class Color {
     }
 
     constructor(H: Int, S: Float, V: Float) {
-        this.H = H
-        this.S = S
-        this.V = V
+        this.H = H.coerceIn(0, 360)
+        this.S = S.coerceIn(0.0F, 1.0F)
+        this.V = V.coerceIn(0.0F, 1.0F)
 
-        val max = (V * 255).roundToInt()
-        val min = (max * (1 - S)).roundToInt()
+        val max = (this.V * 255).roundToInt()
+        val min = (max * (1 - this.S)).roundToInt()
 
-        when (H) {
+        when (this.H) {
             in 300 until 360 -> {
                 this.R = max
                 this.G = min
-                this.B = (-((H - 360) / 60.0) * (max - min) + this.G).roundToInt()
+                this.B = (-((this.H - 360) / 60.0) * (max - min) + this.G).roundToInt()
             }
 
             in 0 until 60 -> {
                 this.R = max
                 this.B = min
-                this.G = ((H / 60.0) * (max - min) + this.B).roundToInt()
+                this.G = ((this.H / 60.0) * (max - min) + this.B).roundToInt()
             }
 
             in 60 until 120 -> {
                 this.G = max
                 this.B = min
-                this.R = (-(H / 60.0 - 2) * (max - min) + this.B).roundToInt()
+                this.R = (-(this.H / 60.0 - 2) * (max - min) + this.B).roundToInt()
             }
 
             in 120 until 180 -> {
                 this.G = max
                 this.R = min
-                this.B = ((H / 60.0 - 2) * (max - min) + this.R).roundToInt()
+                this.B = ((this.H / 60.0 - 2) * (max - min) + this.R).roundToInt()
             }
 
             in 180 until 240 -> {
                 this.B = max
                 this.R = min
-                this.G = (-(H / 60.0 - 4) * (max - min) + this.R).roundToInt()
+                this.G = (-(this.H / 60.0 - 4) * (max - min) + this.R).roundToInt()
             }
 
             in 240 until 300 -> {
                 this.B = max
                 this.G = min
-                this.R = ((H / 60.0 - 4) * (max - min) + this.G).roundToInt()
+                this.R = ((this.H / 60.0 - 4) * (max - min) + this.G).roundToInt()
             }
 
             else -> error("impossible")
@@ -143,6 +143,8 @@ class Color {
         val LIGHT_PURPLE = Color(16733695);
         val YELLOW = Color(16777045);
         val WHITE = Color(16777215);
+
+        val FUEL = Color(0xE9B83B);
 
         fun Pair<Color, Color>.gradient(ratioOfFirst: Float): Color {
             return Color(

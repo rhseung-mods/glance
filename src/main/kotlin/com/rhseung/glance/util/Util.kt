@@ -1,5 +1,6 @@
 package com.rhseung.glance.util
 
+import com.rhseung.glance.util.TooltipSeparator.*
 import com.rhseung.glance.tooltip.factory.TooltipDataFactoryManager
 import net.minecraft.client.MinecraftClient
 import net.minecraft.component.DataComponentTypes
@@ -13,6 +14,8 @@ import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.item.ItemStack
 import net.minecraft.item.tooltip.TooltipData
 import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.util.Rarity
+import java.lang.reflect.Field
 import java.util.*
 
 object Util {
@@ -83,5 +86,48 @@ object Util {
     ) {
         val potionContentsComponent = stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
         potionContentsComponent.effects.forEach { it.effectType.value().forEachAttributeModifier(it.amplifier, attributeModifierConsumer) }
+    }
+
+    @Throws(NoSuchFieldException::class)
+    private fun getField(clazz: Class<*>, fieldName: String): Field {
+        return try {
+            clazz.getDeclaredField(fieldName);
+        } catch (e: NoSuchFieldException) {
+            val superClass = clazz.superclass;
+            if (superClass == null) {
+                throw e;
+            } else {
+                getField(superClass, fieldName);
+            }
+        }
+    }
+
+    fun get(receiver: Any, propertyName: String): Any? {
+        val clazz: Class<*> = receiver.javaClass
+
+        var field: Field? = null
+        try {
+            field = getField(clazz, propertyName)
+        } catch (e: NoSuchFieldException) {
+            return null
+        }
+
+        field.isAccessible = true
+
+        return try {
+            field[receiver]
+        } catch (e: IllegalAccessException) {
+            null
+        }
+    }
+
+    fun toTooltipFrameSeparator(rarity: Rarity): TooltipSeparator {
+        return when (rarity) {
+            Rarity.COMMON -> COMMON;
+            Rarity.UNCOMMON -> UNCOMMON;
+            Rarity.RARE -> RARE;
+            Rarity.EPIC -> EPIC;
+            else -> throw IllegalArgumentException("Invalid rarity: $this");
+        }
     }
 }
