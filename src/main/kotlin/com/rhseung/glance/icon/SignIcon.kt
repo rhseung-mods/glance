@@ -1,34 +1,13 @@
 package com.rhseung.glance.icon
 
 import com.rhseung.glance.ModMain
-import com.rhseung.glance.icon.Icon.Companion
-import com.rhseung.glance.util.Slot
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.component.type.AttributeModifierSlot
+import com.rhseung.glance.draw.Icon
 import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
-class SignIcon(private val path: String) : Icon(1) {
+class SignIcon(private val path: String) : Icon(1, 5, 9) {
     override val id: Identifier = ModMain.of("textures/icon/sign/$path.png");
-
-    override fun draw(context: DrawContext, x: Int, y: Int, index: Int): Int {
-        context.drawTexture(
-            RenderLayer::getGuiTextured, id,
-            x,
-            y - 1,
-            WIDTH.toFloat() * index,
-            0F,
-            WIDTH,
-            HEIGHT,
-            WIDTH * variants,
-            HEIGHT,
-        );
-
-        return x + WIDTH;
-    }
 
     companion object {
         val POSITIVE_UP = SignIcon("positive_up");
@@ -47,8 +26,5 @@ class SignIcon(private val path: String) : Icon(1) {
                 else -> null;
             }
         }
-
-        val WIDTH = 5;
-        val HEIGHT = 9;
     }
 }

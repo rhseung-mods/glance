@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.rhseung.glance.tooltip.AttributeTooltip;
 import com.rhseung.glance.util.Draw;
 import com.rhseung.glance.util.Util;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.OrderedTextTooltipComponent;
@@ -58,11 +59,18 @@ public abstract class DrawContextMixin {
         Identifier texture,
         @Local(argsOnly = true) List<TooltipComponent> components
     ) {
+//        var maxWidth = components.stream().map(c -> {
+//            if (c instanceof AttributeTooltip)
+//                return c.getWidth(MinecraftClient.getInstance().textRenderer) + Draw.ICON_START_PADDING;
+//            else
+//                return c.getWidth(MinecraftClient.getInstance().textRenderer);
+//        }).max(Integer::compareTo).orElse(0);
+
         TooltipBackgroundRenderer.render(
             context,
             x,
             y,
-            width + (!components.stream().map(c -> c instanceof AttributeTooltip).toList().isEmpty() ? Draw.ICON_START_PADDING : 0),
+            width,
             height + ((components.size() <= 1) ? 0 : margin + (usePadding(components) ? paddingBetweenTooltipAndText : 0)),
             z,
             texture

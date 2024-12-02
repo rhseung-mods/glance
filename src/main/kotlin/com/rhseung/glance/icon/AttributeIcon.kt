@@ -1,6 +1,7 @@
 package com.rhseung.glance.icon
 
 import com.rhseung.glance.ModMain
+import com.rhseung.glance.draw.Icon
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.registry.entry.RegistryEntry

@@ -1,6 +1,9 @@
 package com.rhseung.glance.tooltip
 
-import com.rhseung.glance.icon.Icon
+import com.rhseung.glance.draw.DrawableGroup
+import com.rhseung.glance.draw.Icon
+import com.rhseung.glance.draw.Padding
+import com.rhseung.glance.draw.Text.Companion.with
 import com.rhseung.glance.icon.TooltipIcon
 import com.rhseung.glance.tooltip.base.AbstractTooltip
 import com.rhseung.glance.tooltip.factory.TooltipComponentFactoryManager
@@ -23,21 +26,21 @@ class FuelTooltip(override val data: FuelTooltipData) : AbstractTooltip(data) {
         val burnTick = client.world!!.fuelRegistry.getFuelTicks(stack);
         val itemSmeltTick = 200;
         val burnAmount = burnTick.toFloat() / itemSmeltTick;
-        val burnAmountText = Text.literal("${SpecialChar.MULTIPLY}${burnAmount.toStringPretty()}");
+        val burnAmountText = (SpecialChar.MULTIPLY + burnAmount.toStringPretty()) with Color.FUEL;
+
+        fun getTooltip(): DrawableGroup {
+            return DrawableGroup(Padding.ICON_START + TooltipIcon.FUEL + Padding.SPACE + burnAmountText);
+        }
     }
 
+    val tooltip = data.getTooltip();
+
     override fun getHeight(textRenderer: TextRenderer): Int {
-        return if (data.client.currentScreen is AbstractFurnaceScreen<*>)
-            Icon.HEIGHT + Draw.LINE_MARGIN;
-        else
-            0;
+        return tooltip.getHeight(textRenderer);
     }
 
     override fun getWidth(textRenderer: TextRenderer): Int {
-        return if (data.client.currentScreen is AbstractFurnaceScreen<*>)
-            Draw.ICON_START_PADDING + Icon.WIDTH + Draw.SPACE + textRenderer.getWidth(data.burnAmountText);
-        else
-            0;
+        return tooltip.getWidth(textRenderer);
     }
 
     override fun drawItems(
@@ -48,19 +51,14 @@ class FuelTooltip(override val data: FuelTooltipData) : AbstractTooltip(data) {
         height: Int,
         context: DrawContext
     ) {
-        var x = x0 + Draw.ICON_START_PADDING;
-        if (data.client.currentScreen is AbstractFurnaceScreen<*>) {
-            x = TooltipIcon.FUEL.draw(context, x, y0);
-            x += Draw.SPACE;
-            x = data.burnAmountText.withColor(Color.FUEL.toInt()).draw(context, textRenderer, x, y0);
-        }
+        tooltip.draw(context, textRenderer, x0, y0);
     }
 
     companion object {
         fun register() {
             TooltipComponentFactoryManager.set<FuelTooltipData>(::FuelTooltip);
             TooltipDataFactoryManager.set<Item> { item, stack, client ->
-                if (client.world?.fuelRegistry?.isFuel(stack) == true)
+                if (client.world?.fuelRegistry?.isFuel(stack) == true && client.currentScreen is AbstractFurnaceScreen<*>)
                     FuelTooltipData(item, stack, client);
                 else
                     null

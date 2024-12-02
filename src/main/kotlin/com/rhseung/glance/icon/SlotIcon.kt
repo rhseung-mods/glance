@@ -1,11 +1,12 @@
 package com.rhseung.glance.icon
 
 import com.rhseung.glance.ModMain
+import com.rhseung.glance.draw.Icon
 import com.rhseung.glance.util.Slot
 import net.minecraft.component.type.AttributeModifierSlot
 import net.minecraft.util.Identifier
 
-class SlotIcon(private val slot: Slot) : Icon(1) {
+class SlotIcon(private val slot: Slot) : Icon(1, 9, 9) {
     override val id: Identifier = ModMain.of("textures/icon/slot/${slot.name.lowercase()}.png");
 
     fun toSlot() = slot;

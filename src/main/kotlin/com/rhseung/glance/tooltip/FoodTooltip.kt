@@ -1,9 +1,11 @@
 package com.rhseung.glance.tooltip
 
+import com.rhseung.glance.draw.DrawableGroup
+import com.rhseung.glance.draw.DrawableLine
 import com.rhseung.glance.tooltip.base.AbstractTooltip
 import com.rhseung.glance.tooltip.factory.TooltipComponentFactoryManager
 import com.rhseung.glance.tooltip.factory.TooltipDataFactoryManager
-import com.rhseung.glance.icon.Icon
+import com.rhseung.glance.draw.Icon
 import com.rhseung.glance.icon.TooltipIcon
 import com.rhseung.glance.util.Draw
 import net.minecraft.client.MinecraftClient
@@ -21,14 +23,36 @@ class FoodTooltip(override val data: FoodTooltipData) : AbstractTooltip(data) {
         val saturation = food.saturation;
         val hungerIconCount = ceil(hunger / 2.0).toInt();
         val saturationIconCount = ceil(saturation / 2.0).toInt();
+
+        fun getTooltip(): DrawableGroup {
+            var hungerTooltip = DrawableLine();
+            for (i in 0..<hungerIconCount) {
+                if (i == hungerIconCount - 1)
+                    hungerTooltip += TooltipIcon.HUNGER[hunger % 2];
+                else
+                    hungerTooltip += TooltipIcon.HUNGER[0];
+            }
+
+            var saturationTooltip = DrawableLine();
+            for (i in 0..<saturationIconCount) {
+                if (i == saturationIconCount - 1)
+                    saturationTooltip += TooltipIcon.SATURATION[ceil((saturation % 2) / 2 * 3).toInt()];
+                else
+                    saturationTooltip += TooltipIcon.SATURATION[0];
+            }
+
+            return DrawableGroup(hungerTooltip, saturationTooltip);
+        }
     }
 
+    val tooltip = data.getTooltip();
+
     override fun getHeight(textRenderer: TextRenderer): Int {
-        return Icon.HEIGHT + Draw.LINE_MARGIN;
+        return tooltip.getHeight(textRenderer);
     }
 
     override fun getWidth(textRenderer: TextRenderer): Int {
-        return Icon.WIDTH * maxOf(data.hungerIconCount, data.saturationIconCount);
+        return tooltip.getWidth(textRenderer);
     }
 
     override fun drawItems(
@@ -39,25 +63,7 @@ class FoodTooltip(override val data: FoodTooltipData) : AbstractTooltip(data) {
         height: Int,
         context: DrawContext
     ) {
-        var x = x0;
-        for (i in 0..<data.hungerIconCount) {
-            x = x0 + i * Icon.WIDTH;
-
-            if (i == data.hungerIconCount - 1)
-                TooltipIcon.HUNGER.draw(context, x, y0, data.hunger % 2);
-            else
-                TooltipIcon.HUNGER.draw(context, x, y0);
-        }
-
-        x = x0;
-        for (i in 0..<data.saturationIconCount) {
-            x = x0 + i * Icon.WIDTH;
-
-            if (i == data.saturationIconCount - 1)
-                TooltipIcon.SATURATION.draw(context, x, y0, ceil((data.saturation % 2) / 2 * 3).toInt());
-            else
-                TooltipIcon.SATURATION.draw(context, x, y0);
-        }
+        tooltip.draw(context, textRenderer, x0, y0);
     }
 
     companion object {
