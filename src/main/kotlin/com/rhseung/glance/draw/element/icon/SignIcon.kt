@@ -1,13 +1,17 @@
-package com.rhseung.glance.icon
+package com.rhseung.glance.draw.element.icon
 
 import com.rhseung.glance.ModMain
-import com.rhseung.glance.draw.Icon
+import com.rhseung.glance.draw.element.Icon
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
-class SignIcon(private val path: String) : Icon(1, 5, 9) {
-    override val id: Identifier = ModMain.of("textures/icon/sign/$path.png");
+class SignIcon(private val path: String, index: Int = 0) : Icon(1, 5, 9, index) {
+    override val id: Identifier = ModMain.id("textures/icon/sign/$path.png");
+
+    override fun get(index: Int): Icon {
+        return SignIcon(path, index);
+    }
 
     companion object {
         val POSITIVE_UP = SignIcon("positive_up");

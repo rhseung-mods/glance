@@ -1,4 +1,4 @@
-package com.rhseung.glance.util
+package com.rhseung.glance.tooltip.util
 
 import com.rhseung.glance.ModMain
 import com.rhseung.glance.util.Color.Companion.toColor
@@ -13,7 +13,7 @@ enum class TooltipSeparator {
     RARE,
     EPIC;
 
-    val id: Identifier = ModMain.of("textures/frame/default.png");
+    val id: Identifier = ModMain.id("textures/frame/default.png");
 
     fun draw(context: DrawContext, xStart: Int, xEnd: Int, y: Int): Int {
         var x = xStart;

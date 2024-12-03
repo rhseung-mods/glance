@@ -1,8 +1,6 @@
 package com.rhseung.glance.util
 
-import com.rhseung.glance.util.TooltipSeparator.*
-import com.rhseung.glance.tooltip.factory.TooltipDataFactoryManager
-import net.minecraft.client.MinecraftClient
+import com.rhseung.glance.tooltip.util.TooltipSeparator.*
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.EnchantmentEffectComponentTypes
 import net.minecraft.component.type.AttributeModifierSlot
@@ -12,9 +10,10 @@ import net.minecraft.component.type.PotionContentsComponent
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.item.ItemStack
-import net.minecraft.item.tooltip.TooltipData
+import net.minecraft.registry.Registries
+import net.minecraft.registry.Registry
 import net.minecraft.registry.entry.RegistryEntry
-import net.minecraft.util.Rarity
+import net.minecraft.registry.tag.TagKey
 import java.lang.reflect.Field
 import java.util.*
 
@@ -29,18 +28,37 @@ object Util {
 
     fun <T> ifElse(condition: Boolean, ifTrue: T, ifFalse: T): T = if (condition) ifTrue else ifFalse;
 
-    /**
-     * [net.minecraft.item.Item.getTooltipData]
-     */
-    fun ItemStack.getTooltipDataWithClient(client: MinecraftClient): Optional<TooltipData> {
-        val item = this.item;
-        val original = item.getTooltipData(this);
-        val compound = TooltipDataFactoryManager.find(item, this, client);
-        compound.components = compound.components.filter { it.getHeight(client.textRenderer) > 0 }.toMutableList();
+    @Throws(NoSuchFieldException::class)
+    private fun getField(clazz: Class<*>, fieldName: String): Field {
+        return try {
+            clazz.getDeclaredField(fieldName);
+        } catch (e: NoSuchFieldException) {
+            val superClass = clazz.superclass;
+            if (superClass == null) {
+                throw e;
+            } else {
+                getField(superClass, fieldName);
+            }
+        }
+    }
 
-        original.ifPresent { data -> compound.add(0, data) }
+    fun get(receiver: Any, propertyName: String): Any? {
+        val clazz: Class<*> = receiver.javaClass
 
-        return if (compound.size() > 0) Optional.of(compound) else original;
+        var field: Field? = null
+        try {
+            field = getField(clazz, propertyName)
+        } catch (e: NoSuchFieldException) {
+            return null
+        }
+
+        field.isAccessible = true
+
+        return try {
+            field[receiver]
+        } catch (e: IllegalAccessException) {
+            null
+        }
     }
 
     fun defaultAttribute(
@@ -86,48 +104,5 @@ object Util {
     ) {
         val potionContentsComponent = stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
         potionContentsComponent.effects.forEach { it.effectType.value().forEachAttributeModifier(it.amplifier, attributeModifierConsumer) }
-    }
-
-    @Throws(NoSuchFieldException::class)
-    private fun getField(clazz: Class<*>, fieldName: String): Field {
-        return try {
-            clazz.getDeclaredField(fieldName);
-        } catch (e: NoSuchFieldException) {
-            val superClass = clazz.superclass;
-            if (superClass == null) {
-                throw e;
-            } else {
-                getField(superClass, fieldName);
-            }
-        }
-    }
-
-    fun get(receiver: Any, propertyName: String): Any? {
-        val clazz: Class<*> = receiver.javaClass
-
-        var field: Field? = null
-        try {
-            field = getField(clazz, propertyName)
-        } catch (e: NoSuchFieldException) {
-            return null
-        }
-
-        field.isAccessible = true
-
-        return try {
-            field[receiver]
-        } catch (e: IllegalAccessException) {
-            null
-        }
-    }
-
-    fun toTooltipFrameSeparator(rarity: Rarity): TooltipSeparator {
-        return when (rarity) {
-            Rarity.COMMON -> COMMON;
-            Rarity.UNCOMMON -> UNCOMMON;
-            Rarity.RARE -> RARE;
-            Rarity.EPIC -> EPIC;
-            else -> throw IllegalArgumentException("Invalid rarity: $this");
-        }
     }
 }

@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(Item.Settings.class)
 public class SettingsMixin {
+    // rarity를 이용하여 툴팁 스타일을 변경
     @ModifyReturnValue(
         method = "rarity(Lnet/minecraft/util/Rarity;)Lnet/minecraft/item/Item$Settings;",
         at = @At("RETURN")

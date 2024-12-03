@@ -1,7 +1,7 @@
-package com.rhseung.glance.draw
+package com.rhseung.glance.draw.element
 
+import com.rhseung.glance.draw.Drawable
 import com.rhseung.glance.util.Color
-import com.rhseung.glance.util.Draw.draw
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.text.OrderedText
@@ -10,10 +10,10 @@ import net.minecraft.text.Style
 import net.minecraft.text.Text
 import net.minecraft.text.TextContent
 
-class Text(
+class GlanceText(
     val content: String,
     val color: Color? = null
-) : Drawable, net.minecraft.text.Text {
+) : Drawable, Text {
 
     override fun draw(context: DrawContext, renderer: TextRenderer, x0: Int, y0: Int): Int {
         context.drawText(renderer, content, x0, y0, color?.toInt() ?: -1, true);
@@ -48,8 +48,12 @@ class Text(
     }
 
     companion object {
-        infix fun String.with(color: Color): com.rhseung.glance.draw.Text {
-            return Text(this, color);
+        infix fun String.with(color: Color): GlanceText {
+            return GlanceText(this, color);
+        }
+
+        fun Text.toGlanceText(): GlanceText {
+            return GlanceText(this.string, if (this.style.color != null) Color(this.style.color!!.rgb) else null);
         }
     }
 }

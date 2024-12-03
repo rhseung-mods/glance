@@ -1,5 +1,7 @@
-package com.rhseung.glance.draw
+package com.rhseung.glance.draw.element
 
+import com.rhseung.glance.draw.Drawable
+import com.rhseung.glance.draw.DrawableLine
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer
@@ -8,16 +10,10 @@ import net.minecraft.util.Identifier
 abstract class Icon(
     open val variants: Int = 1,
     open val width: Int = 9,
-    open val height: Int = 9
+    open val height: Int = 9,
+    val index: Int = 0,
 ): Drawable {
     abstract val id: Identifier;
-
-    private var index: Int = 0;
-
-    operator fun get(index: Int): Icon {
-        this.index = index;
-        return this;
-    }
 
     override fun getWidth(textRenderer: TextRenderer): Int {
         return width;
@@ -26,6 +22,8 @@ abstract class Icon(
     override fun getHeight(textRenderer: TextRenderer): Int {
         return height;
     }
+
+    abstract operator fun get(index: Int): Icon;
 
     override fun draw(context: DrawContext, renderer: TextRenderer, x0: Int, y0: Int): Int {
         context.drawTexture(RenderLayer::getGuiTextured, id,

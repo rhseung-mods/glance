@@ -1,8 +1,12 @@
 package com.rhseung.glance.draw
 
+import com.rhseung.glance.draw.element.Padding
+import com.rhseung.glance.draw.element.GlanceText
+import com.rhseung.glance.draw.element.StackDisplay
 import com.rhseung.glance.util.Vec2D
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.item.ItemStack
 
 class DrawableLine(vararg val drawables: Drawable) {
     fun draw(context: DrawContext, renderer: TextRenderer, x0: Int, y0: Int): Vec2D {
@@ -27,11 +31,15 @@ class DrawableLine(vararg val drawables: Drawable) {
     }
 
     operator fun plus(string: String): DrawableLine {
-        return DrawableLine(*drawables, Text(string));
+        return DrawableLine(*drawables, GlanceText(string));
     }
 
     operator fun plus(space: Int): DrawableLine {
         return DrawableLine(*drawables, Padding(space));
+    }
+
+    operator fun plus(stack: ItemStack): DrawableLine {
+        return DrawableLine(*drawables, StackDisplay(stack));
     }
 
     operator fun plus(line: DrawableLine): DrawableLine {

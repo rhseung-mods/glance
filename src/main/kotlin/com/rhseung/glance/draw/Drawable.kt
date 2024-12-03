@@ -1,5 +1,7 @@
 package com.rhseung.glance.draw
 
+import com.rhseung.glance.draw.element.Padding
+import com.rhseung.glance.draw.element.GlanceText
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 
@@ -24,11 +26,11 @@ interface Drawable {
         }
 
         operator fun Drawable.plus(text: String): DrawableLine {
-            return DrawableLine(this, Text(text));
+            return DrawableLine(this, GlanceText(text));
         }
 
         operator fun String.plus(drawable: Drawable): DrawableLine {
-            return DrawableLine(Text(this), drawable);
+            return DrawableLine(GlanceText(this), drawable);
         }
 
         operator fun Drawable.plus(line: DrawableLine): DrawableLine {

@@ -1,6 +1,7 @@
 package com.rhseung.glance
 
-import com.rhseung.glance.init.ModTooltips
+import com.rhseung.glance.tooltip.*
+import com.rhseung.glance.tooltip.base.CompoundTooltip
 import net.fabricmc.api.ModInitializer
 import net.minecraft.util.Identifier
 import org.slf4j.LoggerFactory
@@ -9,9 +10,14 @@ object ModMain : ModInitializer {
 	const val MOD_ID = "glance";
     val LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	fun of(path: String) = Identifier.of(MOD_ID, path);
+	fun id(path: String): Identifier = Identifier.of(MOD_ID, path);
 
 	override fun onInitialize() {
-		ModTooltips.register();
+		CompoundTooltip.register();
+		AttributeTooltip.register();
+		FoodTooltip.register();
+		FuelTooltip.register();
+		EnchantedBookTooltip.register();
+		ArmorModelTooltip.register();
 	}
 }

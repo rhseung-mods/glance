@@ -1,13 +1,17 @@
-package com.rhseung.glance.icon
+package com.rhseung.glance.draw.element.icon
 
 import com.rhseung.glance.ModMain
-import com.rhseung.glance.draw.Icon
+import com.rhseung.glance.draw.element.Icon
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.registry.entry.RegistryEntry
 
-class AttributeIcon(private val name: String, variants: Int = 1) : Icon(variants, 9, 9) {
-    override val id = ModMain.of("textures/icon/attribute/$name.png");
+class AttributeIcon(private val name: String, variants: Int = 1, index: Int = 0) : Icon(variants, 9, 9, index) {
+    override val id = ModMain.id("textures/icon/attribute/$name.png");
+
+    override fun get(index: Int): Icon {
+        return AttributeIcon(name, variants, index);
+    }
 
     fun toAttribute() = when (this) {
         ARMOR -> EntityAttributes.ARMOR
