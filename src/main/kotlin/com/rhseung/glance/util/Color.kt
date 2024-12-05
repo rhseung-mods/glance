@@ -96,8 +96,9 @@ class Color {
         return Integer.toHexString(1 shl 24 or (R shl 16) or (G shl 8) or B).substring(1);
     }
 
-    fun toInt(): Int {
-        return Integer.parseInt(toString(), 16);
+    fun toInt(shift: Boolean = false): Int {
+        return if (!shift) Integer.parseInt(toString(), 16)
+        else Integer.parseInt(toString(), 16) - (2 shl 23);
     }
 
     fun toTextColor(): TextColor {

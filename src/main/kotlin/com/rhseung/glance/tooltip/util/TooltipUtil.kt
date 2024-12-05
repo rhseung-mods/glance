@@ -1,6 +1,7 @@
 package com.rhseung.glance.tooltip.util
 
 import com.rhseung.glance.tooltip.base.AbstractTooltip
+import com.rhseung.glance.tooltip.base.ModelTooltip
 import com.rhseung.glance.tooltip.factory.TooltipDataFactoryManager
 import com.rhseung.glance.tooltip.util.TooltipSeparator.*
 import com.rhseung.glance.util.Color
@@ -28,6 +29,7 @@ import org.joml.Quaternionf
 import java.util.*
 import kotlin.math.PI
 import kotlin.math.atan
+import kotlin.math.max
 
 object TooltipUtil {
     fun Rarity.toTooltipSeparator(): TooltipSeparator {
@@ -46,6 +48,7 @@ object TooltipUtil {
     fun ItemStack.getTooltipDataWithClient(client: MinecraftClient): Optional<TooltipData> {
         val item = this.item;
         val original = item.getTooltipData(this);
+
         val compound = TooltipDataFactoryManager.find(item, this, client);
         compound.components = compound.components.filterNot { component ->
             component.getHeight(client.textRenderer) == 0 &&
@@ -80,7 +83,7 @@ object TooltipUtil {
             else isNotText++
         }
 
-        return isText >= 2 && isNotText >= 1;
+        return isText >= 1 && isNotText >= 1;
     }
 
     fun drawTooltip(
@@ -95,125 +98,183 @@ object TooltipUtil {
         if (components.isEmpty())
             return;
 
-        val rarity = stack.rarity;
-        val color = Color(stack.formattedName.style.color?.rgb ?: Color.WHITE.toInt());
-        var tooltipWidth = 0;
-        var tooltipHeight = if (components.size == 1) -2 else 0;
+        // TODO: 첫 component가 OrderedTextTooltipComponent가 아닐 경우, 0번째 인덱스에 CompoundTooltipComponent가 들어오는 경우를 처리
 
-        for (r in components.indices) {
-            val component = components[r];
-            val k = component.getWidth(textRenderer);   // TODO: Icon Display
+        val titleComponent: OrderedTextTooltipComponent = components[0] as OrderedTextTooltipComponent;
+        val modelComponent: ModelTooltip = TooltipComponent.of(ModelTooltip.ModelTooltipData(stack.item, stack, MinecraftClient.getInstance())) as ModelTooltip;
+        val components = components.drop(1);
 
-            if (k > tooltipWidth)
-                tooltipWidth = k;
-            tooltipHeight += component.getHeight(textRenderer);
-        }
+        val tooltipWidth = max(
+            components.maxOfOrNull { it.getWidth(textRenderer) } ?: 0,
+            titleComponent.getWidth(textRenderer) + modelComponent.getWidth(textRenderer)
+        );
+        var tooltipHeight = components.sumOf { it.getHeight(textRenderer) } +
+            modelComponent.getHeight(textRenderer);    // = ITEM_PADDNIG + ITEM_SLOT_SIZE + ITEM_PADDNIG
+
+        if (components.isNotEmpty())
+            tooltipHeight += 1 +     // TooltipSeparator
+            TooltipConstants.ITEM_PADDNIG;
+
+        if (usePadding(components))
+            tooltipHeight += TooltipConstants.BETWEEN_TOOLTIP_TEXT;
 
         val vector2ic = positioner.getPosition(context.scaledWindowWidth, context.scaledWindowHeight, x0, y0, tooltipWidth, tooltipHeight);
         val x0Hover = vector2ic.x();
         val y0Hover = vector2ic.y();
-
-        context.matrices.push();
         val z = 400;
 
-        TooltipBackground.render(
-            context,
-            x0Hover,
-            y0Hover,
-            tooltipWidth,
-            tooltipHeight
-                + if (components.size <= 1) 0 else TooltipConstants.SEPARATOR_MARGIN
-                + if (usePadding(components)) TooltipConstants.BETWEEN_TOOLTIP_TEXT else 0,
-            z,
-            rarity.formatting.toColor()
+        val rarity = stack.rarity;
+        val color = Color(stack.formattedName.style.color?.rgb ?: Color.WHITE.toInt());
+
+        // Render tooltip background
+        TooltipBackground.render(context, x0Hover, y0Hover, tooltipWidth, tooltipHeight, z, color);
+
+        // Render model
+        TooltipBackground.render(context,
+            x0Hover + TooltipConstants.ITEM_PADDNIG + 1, y0Hover + TooltipConstants.ITEM_PADDNIG + 1,
+            TooltipConstants.ITEM_SLOT_SIZE - 4, TooltipConstants.ITEM_SLOT_SIZE - 4,
+            z, color
         );
 
-//        val item = stack.item;
-//        if (item is ArmorItem) {
-//            val entity = ArmorStandEntity(EntityType.ARMOR_STAND, MinecraftClient.getInstance().world);
-//            val slot = item.components[DataComponentTypes.EQUIPPABLE]!!.slot;
-//            entity.equipStack(slot, stack);
-//
-//            val entityRenderDispatcher = MinecraftClient.getInstance().entityRenderDispatcher;
-//            val mouseX = 45f;
-//            val mouseY = -45f;
-//            val f = atan(mouseX / 40f);
-//            val g = atan(mouseY / 40f);
-//            val quaternionf = Quaternionf().rotateZ(PI.toFloat());
-//            val quaternionf2 = Quaternionf().rotateX(g * 20.0f * PI.toFloat() / 180F);
-//            quaternionf.mul(quaternionf2);
-//
-//            entity.bodyYaw = mouseX;
-//            entity.yaw = 180f + f * 40f;
-//            entity.pitch = -g * 20f;
-//            entity.headYaw = entity.yaw;
-//            entity.prevHeadYaw = entity.yaw;
-//
-//            context.matrices.push();
-//            context.matrices.translate(x0Hover - 30.0, y0Hover.toDouble(), z.toDouble());
-//            context.matrices.multiplyPositionMatrix(Matrix4f().scaling(30f, 30f, -30f));
-//            context.matrices.multiply(quaternionf);
-//            if (quaternionf2 != null) {
-//                quaternionf2.conjugate();
-//                entityRenderDispatcher.rotation = quaternionf2;
-//            }
-//
-//            context.draw();
-//            DiffuseLighting.method_34742();
-//            entityRenderDispatcher.setRenderShadows(false);
-//            context.draw { vertexConsumers -> entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 1.0f, context.matrices, vertexConsumers, 15728880) };
-//            context.draw();
-//            entityRenderDispatcher.setRenderShadows(true);
-//            context.matrices.pop();
-//            DiffuseLighting.enableGuiDepthLighting();
-//        }
-//
-        context.matrices.translate(0.0f, 0.0f, z.toFloat());
-        var y = y0Hover;
+        context.matrices.push();
+        context.matrices.translate(0f, 0f, z.toFloat());
+        context.drawItem(stack,
+            x0Hover + TooltipConstants.ITEM_PADDNIG + (TooltipConstants.ITEM_SLOT_SIZE - 16) / 2 - 1,
+            y0Hover + TooltipConstants.ITEM_PADDNIG + (TooltipConstants.ITEM_SLOT_SIZE - 16) / 2 - 1
+        );
 
-        for (r in components.indices) {
-            val component = components[r];
+//        modelComponent.drawItems(
+//            textRenderer,
+//            x0Hover + TooltipConstants.ITEM_PADDNIG + TooltipConstants.ITEM_SLOT_SIZE / 2,
+//            y0Hover + TooltipConstants.ITEM_PADDNIG + TooltipConstants.ITEM_SLOT_SIZE / 2,
+//            tooltipWidth,
+//            tooltipHeight,
+//            context
+//        );
 
-            if (r == 1)
-                y += TooltipConstants.SEPARATOR_MARGIN + if (usePadding(components)) TooltipConstants.BETWEEN_TOOLTIP_TEXT else 0;
+        // Render title
+        titleComponent.drawText(textRenderer,
+            x0Hover + modelComponent.getWidth(textRenderer),
+            y0Hover + TooltipConstants.ITEM_PADDNIG + TooltipConstants.ITEM_SLOT_SIZE / 2 - textRenderer.fontHeight / 2,
+            context.matrices.peek().positionMatrix,
+            Util.get(context, "vertexConsumers") as Immediate
+        );
 
-            component.drawText(
-                textRenderer,
+        // Render separator
+        if (components.isNotEmpty()) {
+            rarity.toTooltipSeparator().draw(
+                context,
+                x0Hover,
+                x0Hover + tooltipWidth,
+                y0Hover + modelComponent.getHeight(textRenderer)
+            );
+        }
+
+        // Render components
+        var y = y0Hover + modelComponent.getHeight(textRenderer) + 1 + TooltipConstants.ITEM_PADDNIG;
+        if (usePadding(components))
+            y += TooltipConstants.BETWEEN_TOOLTIP_TEXT;
+
+        for (component in components) {
+            component.drawText(textRenderer,
                 x0Hover,
                 y,
                 context.matrices.peek().positionMatrix,
                 Util.get(context, "vertexConsumers") as Immediate
-            )
-            y += component.getHeight(textRenderer) + (if (r == 0) 2 else 0)
+            );
+
+            y += component.getHeight(textRenderer);
         }
 
-        y = y0Hover;
+        y = y0Hover + modelComponent.getHeight(textRenderer) + 1 + TooltipConstants.ITEM_PADDNIG;
 
-        for (r in components.indices) {
-            val component = components[r];
-
-            component.drawItems(
-                textRenderer,
+        for (component in components) {
+            component.drawItems(textRenderer,
                 x0Hover,
                 y,
                 tooltipWidth,
-                tooltipHeight + TooltipConstants.SEPARATOR_MARGIN,
+                tooltipHeight,
                 context
-            )
+            );
 
-            if (components.size > 1 && r == 0) {
-                rarity.toTooltipSeparator().draw(
-                    context,
-                    x0Hover,
-                    x0Hover + tooltipWidth,
-                    y + component.getHeight(textRenderer) + TooltipConstants.SEPARATOR_MARGIN / 2
-                );
-                y += TooltipConstants.SEPARATOR_MARGIN;
-            }
-
-            y += component.getHeight(textRenderer) + (if (r == 0) 2 else 0);
+            y += component.getHeight(textRenderer);
         }
 
         context.matrices.pop();
+
+//        val vector2ic = positioner.getPosition(context.scaledWindowWidth, context.scaledWindowHeight, x0, y0, tooltipWidth, tooltipHeight);
+//        val x0Hover = vector2ic.x();
+//        val y0Hover = vector2ic.y();
+//
+//        context.matrices.push();
+//        val z = 400;
+//
+//        TooltipBackground.render(
+//            context,
+//            x0Hover,
+//            y0Hover,
+//            tooltipWidth,
+//            tooltipHeight
+//                + if (components.size <= 1) 0 else TooltipConstants.SEPARATOR_MARGIN
+//                + if (usePadding(components)) TooltipConstants.BETWEEN_TOOLTIP_TEXT else 0,
+//            z,
+//            rarity.formatting.toColor()
+//        );
+//
+//        context.matrices.translate(0.0f, 0.0f, z.toFloat());
+//        var y = y0Hover;
+//
+//        titleComponent.drawText(
+//            textRenderer,
+//            x0Hover,
+//            y,
+//            context.matrices.peek().positionMatrix,
+//            Util.get(context, "vertexConsumers") as Immediate
+//        );
+//        y += titleComponent.getHeight(textRenderer);
+//
+//        rarity.toTooltipSeparator().draw(
+//            context,
+//            x0Hover,
+//            x0Hover + tooltipWidth,
+//            y + titleComponent.getHeight(textRenderer) + TooltipConstants.SEPARATOR_MARGIN / 2
+//        );
+//        y += TooltipConstants.SEPARATOR_MARGIN;
+//
+//        for (r in 1..<components.size) {
+//            val component = components[r];
+//
+//            if (r == 1)
+//                y += TooltipConstants.SEPARATOR_MARGIN + if (usePadding(components)) TooltipConstants.BETWEEN_TOOLTIP_TEXT else 0;
+//
+//            component.drawText(
+//                textRenderer,
+//                x0Hover,
+//                y,
+//                context.matrices.peek().positionMatrix,
+//                Util.get(context, "vertexConsumers") as Immediate
+//            )
+//
+//            y += component.getHeight(textRenderer);
+//        }
+//
+//        y = y0Hover;
+//
+//        for (r in 1..<components.size) {
+//            val component = components[r];
+//
+//            component.drawItems(
+//                textRenderer,
+//                x0Hover,
+//                y,
+//                tooltipWidth,
+//                tooltipHeight + TooltipConstants.SEPARATOR_MARGIN,
+//                context
+//            )
+//
+//            y += component.getHeight(textRenderer) + (if (r == 0) 2 else 0);
+//        }
+//
+//        context.matrices.pop();
     }
 }
