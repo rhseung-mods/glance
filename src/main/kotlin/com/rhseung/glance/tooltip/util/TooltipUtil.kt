@@ -1,11 +1,11 @@
 package com.rhseung.glance.tooltip.util
 
+import com.rhseung.glance.draw.DrawHelper
 import com.rhseung.glance.tooltip.base.AbstractTooltip
 import com.rhseung.glance.tooltip.base.ModelTooltip
 import com.rhseung.glance.tooltip.factory.TooltipDataFactoryManager
 import com.rhseung.glance.tooltip.util.TooltipSeparator.*
 import com.rhseung.glance.util.Color
-import com.rhseung.glance.util.Color.Companion.toColor
 import com.rhseung.glance.util.Util
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
@@ -14,21 +14,13 @@ import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner
 import net.minecraft.client.gui.tooltip.OrderedTextTooltipComponent
 import net.minecraft.client.gui.tooltip.TooltipComponent
 import net.minecraft.client.gui.tooltip.TooltipPositioner
-import net.minecraft.client.render.DiffuseLighting
 import net.minecraft.client.render.VertexConsumerProvider.Immediate
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.item.ArmorItem
 import net.minecraft.item.ItemStack
 import net.minecraft.item.tooltip.TooltipData
 import net.minecraft.text.Text
 import net.minecraft.util.Rarity
-import org.joml.Matrix4f
-import org.joml.Quaternionf
 import java.util.*
-import kotlin.math.PI
-import kotlin.math.atan
+import javax.tools.Tool
 import kotlin.math.max
 
 object TooltipUtil {
@@ -123,6 +115,10 @@ object TooltipUtil {
         val y0Hover = vector2ic.y();
         val z = 400;
 
+        context.matrices.push();
+        context.matrices.translate(0f, 0f, z.toFloat());
+        context.matrices.pop();
+
         val rarity = stack.rarity;
         val color = Color(stack.formattedName.style.color?.rgb ?: Color.WHITE.toInt());
 
@@ -143,31 +139,25 @@ object TooltipUtil {
             y0Hover + TooltipConstants.ITEM_PADDNIG + (TooltipConstants.ITEM_SLOT_SIZE - 16) / 2 - 1
         );
 
-//        modelComponent.drawItems(
-//            textRenderer,
-//            x0Hover + TooltipConstants.ITEM_PADDNIG + TooltipConstants.ITEM_SLOT_SIZE / 2,
-//            y0Hover + TooltipConstants.ITEM_PADDNIG + TooltipConstants.ITEM_SLOT_SIZE / 2,
-//            tooltipWidth,
-//            tooltipHeight,
-//            context
-//        );
-
         // Render title
         titleComponent.drawText(textRenderer,
             x0Hover + modelComponent.getWidth(textRenderer),
-            y0Hover + TooltipConstants.ITEM_PADDNIG + TooltipConstants.ITEM_SLOT_SIZE / 2 - textRenderer.fontHeight / 2,
+            y0Hover + TooltipConstants.ITEM_PADDNIG + TooltipConstants.ITEM_SLOT_SIZE / 2 - (textRenderer.fontHeight / 2 + 1),
             context.matrices.peek().positionMatrix,
             Util.get(context, "vertexConsumers") as Immediate
         );
 
         // Render separator
         if (components.isNotEmpty()) {
-            rarity.toTooltipSeparator().draw(
-                context,
-                x0Hover,
-                x0Hover + tooltipWidth,
-                y0Hover + modelComponent.getHeight(textRenderer)
-            );
+            DrawHelper.drawHorizontalLine(context, x0Hover, x0Hover + tooltipWidth / 2, y0Hover + modelComponent.getHeight(textRenderer), z) { color.darker(1 - it) };
+            DrawHelper.drawHorizontalLine(context, x0Hover + tooltipWidth / 2 + 1, x0Hover + tooltipWidth, y0Hover + modelComponent.getHeight(textRenderer), z) { color.darker(it) };
+
+//            rarity.toTooltipSeparator().draw(
+//                context,
+//                x0Hover,
+//                x0Hover + tooltipWidth,
+//                y0Hover + modelComponent.getHeight(textRenderer)
+//            );
         }
 
         // Render components

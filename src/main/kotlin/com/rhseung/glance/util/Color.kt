@@ -113,12 +113,20 @@ class Color {
         );
     }
 
+    fun darker(delta: Float): Color {
+        return darker((delta * 255).toInt());
+    }
+
     fun brighter(delta: Int): Color {
         return Color(
             (R + delta).coerceIn(0, 255),
             (G + delta).coerceIn(0, 255),
             (B + delta).coerceIn(0, 255)
         );
+    }
+
+    fun brighter(delta: Float): Color {
+        return brighter((delta * 255).toInt());
     }
 
     companion object {
