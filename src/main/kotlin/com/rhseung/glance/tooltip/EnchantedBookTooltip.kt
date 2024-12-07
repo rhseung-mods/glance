@@ -38,7 +38,7 @@ class EnchantedBookTooltip(data: EnchantmentTooltipData) :
                 val enchantment = enchantmentEntry.value();
                 tooltip += DrawableLine(Enchantment.getName(enchantmentEntry, level).toGlanceText());
 
-                var line = Padding.ICON_START + Padding.ENCHANT_TEST_ITEM_MARGIN;
+                var line = DrawableLine(Padding.ENCHANT_TEST_ITEM_MARGIN);
                 testItems.forEach { testItem ->
                     if (enchantment.isAcceptableItem(testItem)) {
                         val stackDisplay = StackDisplay(testItem, 9);

@@ -23,7 +23,7 @@ class FuelTooltip(data: FuelTooltipData) : AbstractTooltip<FuelTooltip.FuelToolt
         val burnAmountText = (SpecialChar.MULTIPLY + burnAmount.toStringPretty()) with Color.FUEL;
 
         override fun getTooltip(): DrawableTooltip {
-            return DrawableTooltip(Padding.ICON_START + TooltipIcon.FUEL + Padding.SPACE + burnAmountText);
+            return DrawableTooltip(TooltipIcon.FUEL + Padding.SPACE + burnAmountText);
         }
     }
 

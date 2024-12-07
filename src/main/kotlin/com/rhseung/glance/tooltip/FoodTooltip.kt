@@ -24,7 +24,7 @@ class FoodTooltip(data: FoodTooltipData) : AbstractTooltip<FoodTooltip.FoodToolt
         val saturationIconCount = ceil(saturation / 2.0).toInt();
 
         override fun getTooltip(): DrawableTooltip {
-            var hungerTooltip = DrawableLine(Padding.ICON_START);
+            var hungerTooltip = DrawableLine();
             for (i in 0..<hungerIconCount) {
                 if (i == hungerIconCount - 1)
                     hungerTooltip += TooltipIcon.HUNGER[hunger % 2];
@@ -32,7 +32,7 @@ class FoodTooltip(data: FoodTooltipData) : AbstractTooltip<FoodTooltip.FoodToolt
                     hungerTooltip += TooltipIcon.HUNGER;
             }
     
-            var saturationTooltip = DrawableLine(Padding.ICON_START);
+            var saturationTooltip = DrawableLine();
             for (i in 0..<saturationIconCount) {
                 if (i == saturationIconCount - 1)
                     saturationTooltip += TooltipIcon.SATURATION[ceil((saturation % 2) / 2 * 3).toInt()];

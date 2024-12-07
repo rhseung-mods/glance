@@ -23,7 +23,8 @@ class DrawableTooltip(vararg val lines: DrawableLine) {
     }
 
     fun getHeight(textRenderer: TextRenderer): Int {
-        return lines.sumOf { it.getHeight(textRenderer) } + Padding.LINE_MARGIN.size * lines.size;
+        if (lines.isEmpty()) return 0;
+        return lines.sumOf { it.getHeight(textRenderer) } + Padding.LINE_MARGIN.size * (lines.size - 1);
     }
 
     operator fun plus(other: DrawableLine): DrawableTooltip {

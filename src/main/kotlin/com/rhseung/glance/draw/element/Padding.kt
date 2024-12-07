@@ -15,7 +15,6 @@ data class Padding(val size: Int) : Drawable {
         val BETWEEN_SIGN_VALUE = Padding(2);
         val SLOT_MARGIN = Padding(12);
         val NEXT_ICON = Padding(8);
-        val ICON_START = Padding(1);
         val ENCHANT_TEST_ITEM_MARGIN = Padding(SLOT_MARGIN.size - SPACE.size);
     }
 

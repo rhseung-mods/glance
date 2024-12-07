@@ -130,12 +130,12 @@ class AttributeTooltip(data: AttributeTooltipData) : AbstractTooltip<AttributeTo
         override fun getTooltip(): DrawableTooltip {
             var ret = DrawableTooltip();
             if (attributes.size > 1)
-                attributes.forEach { (slot, line) -> ret += Padding.ICON_START + slot.toIcon() + Padding.SPACE + ">" + Padding.SLOT_MARGIN + line; };
+                attributes.forEach { (slot, line) -> ret += slot.toIcon() + Padding.SPACE + ">" + Padding.SLOT_MARGIN + line; };
             else
-                attributes.forEach { (_, line) -> ret += Padding.ICON_START + line; };
+                attributes.forEach { (_, line) -> ret += line; };
 
             if (client.options.advancedItemTooltips && attributes.size > 1)
-                ret += Padding.ICON_START + durabilityTooltip;
+                ret += durabilityTooltip;
 
             return ret;
         }

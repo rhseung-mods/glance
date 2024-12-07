@@ -1,6 +1,5 @@
 package com.rhseung.glance.util
 
-import com.rhseung.glance.tooltip.util.TooltipSeparator.*
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.EnchantmentEffectComponentTypes
 import net.minecraft.component.type.AttributeModifierSlot
@@ -10,12 +9,8 @@ import net.minecraft.component.type.PotionContentsComponent
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.item.ItemStack
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
 import net.minecraft.registry.entry.RegistryEntry
-import net.minecraft.registry.tag.TagKey
 import java.lang.reflect.Field
-import java.util.*
 
 object Util {
     fun Double.roundTo(n: Int) = "%.${n}f".format(this).toDouble();
@@ -25,6 +20,18 @@ object Util {
     fun Double.toStringPretty() = this.roundTo(2).toString().removeSuffix("0").removeSuffix(".");
 
     fun Float.toStringPretty() = this.roundTo(2).toString().removeSuffix("0").removeSuffix(".");
+
+    // TODO: x0Hover..(x0Hover + tooltipWidth) => x0Hover with tooltipWidth
+    fun Int.toRangeSize(size: Int) = this..<(this + size);
+
+    fun IntRange.modify(startDelta: Int, endDelta: Int) = (this.start + startDelta)..(this.endInclusive + endDelta);
+
+    fun IntRange.size() = this.endExclusive - this.start;
+
+    fun IntRange.splitToTwo(): Pair<IntRange, IntRange> {
+        val mid = (this.start + this.endInclusive) / 2;
+        return this.start..mid to (mid + 1)..this.endInclusive;
+    }
 
     fun <T> ifElse(condition: Boolean, ifTrue: T, ifFalse: T): T = if (condition) ifTrue else ifFalse;
 

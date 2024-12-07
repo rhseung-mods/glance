@@ -1,18 +1,19 @@
 {
-    "required": true,
-    "package": "com.rhseung.glance.mixin",
-    "compatibilityLevel": "JAVA_21",
-    "mixins": [
-        "EnchantmentMixin",
-        "ItemStackMixin",
-        "PotionContentsComponentMixin",
-        "SettingsMixin"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    },
-    "client": [
-        "HandledScreenMixin",
-        "TooltipComponentMixin"
-    ]
+  "required": true,
+  "package": "com.rhseung.glance.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "EnchantmentMixin",
+    "ItemStackMixin",
+    "PotionContentsComponentMixin",
+    "SettingsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "BundleTooltipComponentMixin",
+    "HandledScreenMixin",
+    "TooltipComponentMixin"
+  ]
 }

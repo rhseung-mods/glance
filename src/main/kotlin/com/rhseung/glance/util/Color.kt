@@ -7,8 +7,17 @@ import kotlin.math.roundToInt
 
 class Color {
     val R: Int
+    val r: Float
+        get() = R.toFloat() / 255.0f;
+
     val G: Int
+    val g: Float
+        get() = G.toFloat() / 255.0f;
+
     val B: Int
+    val b: Float
+        get() = B.toFloat() / 255.0f;
+
     val H: Int
     val S: Float
     val V: Float
@@ -17,7 +26,6 @@ class Color {
         this.R = R.coerceIn(0, 255)
         this.G = G.coerceIn(0, 255)
         this.B = B.coerceIn(0, 255)
-
         val r = this.R / 255.0F
         val g = this.G / 255.0F
         val b = this.B / 255.0F
@@ -45,7 +53,6 @@ class Color {
         this.H = H.coerceIn(0, 360)
         this.S = S.coerceIn(0.0F, 1.0F)
         this.V = V.coerceIn(0.0F, 1.0F)
-
         val max = (this.V * 255).roundToInt()
         val min = (max * (1 - this.S)).roundToInt()
 

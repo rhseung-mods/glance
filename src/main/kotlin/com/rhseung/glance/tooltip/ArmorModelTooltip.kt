@@ -6,10 +6,10 @@ import com.rhseung.glance.tooltip.factory.TooltipComponentFactoryManager
 import com.rhseung.glance.tooltip.factory.TooltipDataFactoryManager
 import com.rhseung.glance.tooltip.util.TooltipBackground
 import com.rhseung.glance.util.Color.Companion.toColor
+import com.rhseung.glance.util.Util.toRangeSize
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner
 import net.minecraft.client.render.DiffuseLighting
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.entity.EntityType
@@ -80,8 +80,7 @@ class ArmorModelTooltip(val data: ArmorModelTooltipData) : AbstractTooltip<Armor
         // TODO: Background
         TooltipBackground.render(
             context,
-            x.toInt() + 5, y.toInt() - 28,
-            width, height,
+            (x.toInt() + 5).toRangeSize(width), (y.toInt() - 28).toRangeSize(height),
             400,
             data.stack.rarity.formatting.toColor()
         )
