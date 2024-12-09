@@ -1,6 +1,8 @@
 package com.rhseung.glance.tooltip.base
 
 import com.rhseung.glance.tooltip.factory.TooltipComponentFactoryManager
+import com.rhseung.glance.tooltip.template.AbstractTooltipTemplate.Companion.getExactSize
+import com.rhseung.glance.tooltip.util.TooltipConstants
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.tooltip.TooltipComponent
@@ -22,7 +24,7 @@ class CompoundTooltip(private val data: CompoundTooltipData) : TooltipComponent 
     }
 
     override fun getHeight(textRenderer: TextRenderer): Int {
-        return data.components.sumOf { it.getHeight(textRenderer) };
+        return data.components.sumOf { it.getHeight(textRenderer) } + (getExactSize(data.components, textRenderer) - 1).coerceAtLeast(0) * TooltipConstants.LINE_MARGIN;
     }
 
     override fun getWidth(textRenderer: TextRenderer): Int {
@@ -41,7 +43,9 @@ class CompoundTooltip(private val data: CompoundTooltipData) : TooltipComponent 
 
         data.components.forEach {
             it.drawItems(textRenderer, x0, y, width, height, context);
-            y += it.getHeight(textRenderer);
+
+            if (it.getHeight(textRenderer) == 0) return@forEach;
+            y += it.getHeight(textRenderer) + TooltipConstants.LINE_MARGIN;
         }
     }
 

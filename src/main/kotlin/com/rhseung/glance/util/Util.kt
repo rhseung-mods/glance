@@ -49,22 +49,28 @@ object Util {
         }
     }
 
-    fun get(receiver: Any, propertyName: String): Any? {
+    fun <T> Any.getProperty(propertyName: String): T {
+        return get(this, propertyName);
+    }
+
+    fun <T> get(receiver: Any, propertyName: String): T {
         val clazz: Class<*> = receiver.javaClass
 
         var field: Field? = null
         try {
             field = getField(clazz, propertyName)
         } catch (e: NoSuchFieldException) {
-            return null
+            throw e
         }
 
         field.isAccessible = true
 
         return try {
-            field[receiver]
+            field[receiver] as T
         } catch (e: IllegalAccessException) {
-            null
+            throw e
+        } catch (e: ClassCastException) {
+            throw e
         }
     }
 

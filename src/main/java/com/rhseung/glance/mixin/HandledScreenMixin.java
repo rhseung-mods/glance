@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipData;
 import net.minecraft.text.Text;
@@ -20,13 +21,17 @@ import java.util.Optional;
 @Mixin(HandledScreen.class)
 public class HandledScreenMixin {
     @Redirect(
-        method = "drawMouseoverTooltip(Lnet/minecraft/client/gui/DrawContext;II)V",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"
-        )
+            method = "drawMouseoverTooltip(Lnet/minecraft/client/gui/DrawContext;II)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"
+            )
     )
-    public void drawTooltipRedirect(DrawContext context, TextRenderer textRenderer, List<Text> text, Optional<TooltipData> data, int x, int y, Identifier texture, @Local ItemStack stack) {
-        TooltipUtil.INSTANCE.drawTooltip(context, textRenderer, text, TooltipUtil.INSTANCE.getTooltipDataWithClient(stack, MinecraftClient.getInstance()), x, y, stack);
+    public void drawTooltipRedirect(DrawContext context, TextRenderer textRenderer, List<Text> text, Optional<TooltipData> data, int mouseX, int mouseY, Identifier texture, @Local ItemStack stack) {
+        TooltipUtil.INSTANCE.drawTooltipText(
+            context, textRenderer, text,
+            TooltipUtil.INSTANCE.getTooltipDataWithClient(stack, MinecraftClient.getInstance()),
+            mouseX, mouseY, HoveredTooltipPositioner.INSTANCE, stack
+        );
     }
 }

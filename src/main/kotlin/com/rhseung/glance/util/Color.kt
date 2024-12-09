@@ -105,7 +105,11 @@ class Color {
 
     fun toInt(shift: Boolean = false): Int {
         return if (!shift) Integer.parseInt(toString(), 16)
-        else Integer.parseInt(toString(), 16) - (2 shl 23);
+        else Integer.parseInt(toString(), 16) - (2 shl 23);     // and 0xFFFFFF 했더니 아무것도 안 나옴. 찾는데 한 2시간 걸림. 하지마라...
+    }
+
+    fun toIntAlpha(alpha: Int): Int {
+        return (alpha.coerceIn(0, 255) shl 24) or toInt(true);
     }
 
     fun toTextColor(): TextColor {

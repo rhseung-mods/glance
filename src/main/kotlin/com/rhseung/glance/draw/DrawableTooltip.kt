@@ -12,7 +12,9 @@ class DrawableTooltip(vararg val lines: DrawableLine) {
         lines.forEach { line ->
             cursor = line.draw(context, renderer, cursor.x, cursor.y);
             cursor.x = x0;
-            cursor.y += Padding.LINE_MARGIN.size;
+
+            if (line.getHeight(renderer) > 0)
+                cursor.y += Padding.LINE_MARGIN.size;
         }
 
         return cursor;
@@ -23,8 +25,14 @@ class DrawableTooltip(vararg val lines: DrawableLine) {
     }
 
     fun getHeight(textRenderer: TextRenderer): Int {
-        if (lines.isEmpty()) return 0;
-        return lines.sumOf { it.getHeight(textRenderer) } + Padding.LINE_MARGIN.size * (lines.size - 1);
+        val size = lines.size - getZeroHeightComponentCount(textRenderer);
+
+        if (size <= 0) return 0;
+        return lines.sumOf { it.getHeight(textRenderer) } + Padding.LINE_MARGIN.size * (size - 1);
+    }
+
+    fun getZeroHeightComponentCount(textRenderer: TextRenderer): Int {
+        return lines.count { it.getHeight(textRenderer) == 0 };
     }
 
     operator fun plus(other: DrawableLine): DrawableTooltip {

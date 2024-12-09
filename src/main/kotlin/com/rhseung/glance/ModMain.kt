@@ -1,5 +1,6 @@
 package com.rhseung.glance
 
+import com.rhseung.glance.draw.DrawHelper
 import com.rhseung.glance.tooltip.*
 import com.rhseung.glance.tooltip.base.CompoundTooltip
 import net.fabricmc.api.ModInitializer

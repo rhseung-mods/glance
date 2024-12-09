@@ -21,11 +21,11 @@ object DrawHelper {
         }
     }
 
-    fun drawHorizontalLine(context: DrawContext, xRange: IntRange, y: Int, z: Int, colorFactory: (Float) -> Color) {
+    fun drawHorizontalLine(context: DrawContext, xRange: IntRange, y: Int, colorFactory: (Float) -> Color) {
         assert(!xRange.isEmpty()) { "Range must not be empty" };
 
         for (x in xRange) {
-            val ratio = (x - xRange.start).toFloat() / xRange.size();
+            val ratio = (x - xRange.first).toFloat() / xRange.size();
             context.drawTexture(RenderLayer::getGuiTextured, DOT, x, y, 0f, 0f, 1, 1, 1, 1, colorFactory(ratio).toInt(true));
         }
     }
@@ -42,25 +42,24 @@ object DrawHelper {
         assert(!yRange.isEmpty()) { "Range must not be empty" };
 
         for (y in yRange) {
-            val ratio = (y - yRange.start).toFloat() / yRange.size();
+            val ratio = (y - yRange.first).toFloat() / yRange.size();
             context.drawTexture(RenderLayer::getGuiTextured, DOT, x, y, 0f, 0f, 1, 1, 1, 1, colorFactory(ratio).toInt(true));
         }
     }
 
     fun drawBorder(context: DrawContext, xRange: IntRange, yRange: IntRange, z: Int, color: Color = Color.WHITE) {
-        drawHorizontalLine(context, xRange.modify(1, -1), yRange.start, z, color);
-        drawHorizontalLine(context, xRange.modify(1, -1), yRange.endInclusive, z, color);
-        drawVerticalLine(context, yRange.modify(1, -1), xRange.start, z, color);
-        drawVerticalLine(context, yRange.modify(1, -1), xRange.endInclusive, z, color);
+        drawHorizontalLine(context, xRange.modify(1, -1), yRange.first, z, color);
+        drawHorizontalLine(context, xRange.modify(1, -1), yRange.last, z, color);
+        drawVerticalLine(context, yRange.modify(1, -1), xRange.first, z, color);
+        drawVerticalLine(context, yRange.modify(1, -1), xRange.last, z, color);
     }
 
     fun drawBorder(context: DrawContext, xRange: IntRange, yRange: IntRange, z: Int, colorFactory: (Float) -> Color) {
-        drawHorizontalLine(context, xRange.modify(1, -1), yRange.start, z, colorFactory(0f));
-        drawHorizontalLine(context, xRange.modify(1, -1), yRange.endInclusive, z, colorFactory(1f));
-        drawVerticalLine(context, yRange.modify(1, -1), xRange.start, z, colorFactory);
-        drawVerticalLine(context, yRange.modify(1, -1), xRange.endInclusive, z, colorFactory);
+        drawHorizontalLine(context, xRange.modify(1, -1), yRange.first, z, colorFactory(0f));
+        drawHorizontalLine(context, xRange.modify(1, -1), yRange.last, z, colorFactory(1f));
+        drawVerticalLine(context, yRange.modify(1, -1), xRange.first, z, colorFactory);
+        drawVerticalLine(context, yRange.modify(1, -1), xRange.last, z, colorFactory);
     }
-
 //    fun drawTexture()
 
     fun drawSprite(context: DrawContext, sprite: Identifier, xRange: IntRange, yRange: IntRange, z: Int, color: Color = Color.WHITE) {
@@ -70,7 +69,7 @@ object DrawHelper {
         
 //        context.matrices.push();
         context.matrices.translate(0f, 0f, z.toFloat());
-        context.drawGuiTexture(RenderLayer::getGuiTextured, sprite, xRange.start, yRange.start, xRange.size(),yRange.size(), color.toInt(true));
+        context.drawGuiTexture(RenderLayer::getGuiTextured, sprite, xRange.first, yRange.first, xRange.size(),yRange.size(), color.toInt(true));
 //        context.matrices.pop();
     }
 

@@ -42,7 +42,7 @@ class AttributeTooltip(data: AttributeTooltipData) : AbstractTooltip<AttributeTo
         private val durability = stack.maxDamage - stack.damage;
         private val maxDurability = stack.maxDamage;
 
-        private val durabilityTooltip = TooltipIcon.DURABILITY +
+        private val durabilityTooltip = TooltipIcon.DURABILITY + Padding.SPACE +
             ("$durability" with Color.WHITE) +
             ("/$maxDurability" with Color.DARK_GRAY);
 
