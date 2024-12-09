@@ -13,9 +13,9 @@
     },
     "client": [
         "BundleTooltipComponentMixin",
+        "DrawContextMixin",
         "HandledScreenMixin",
         "OrderedTextTooltipComponentMixin",
-        "ScreenMixin",
         "TooltipComponentMixin"
     ]
 }
