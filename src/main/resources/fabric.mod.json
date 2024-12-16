@@ -26,6 +26,12 @@
 				"value": "com.rhseung.glance.ModData",
 				"adapter": "kotlin"
 			}
+		],
+		"client": [
+			{
+				"value": "com.rhseung.glance.ModClient",
+				"adapter": "kotlin"
+			}
 		]
 	},
 	"mixins": [

@@ -27,7 +27,7 @@ enum class TooltipSeparator {
             var current = if (now_x < middle) now_x else end - now_x;
             var currentRatio = current.toFloat() / middle.toFloat();    // current가 middle이 되면 1.
 //            var color = (toRarity().formatting.toColor() to BACKGROUND_COLOR).gradient(currentRatio);
-            var color = toRarity().formatting.toColor().darker(((1 - currentRatio) * 255).toInt());
+//            var color = toRarity().formatting.toColor().darker(((1 - currentRatio) * 255).toInt());
 
             context.drawTexture(RenderLayer::getGuiTextured, id,
                 x,
@@ -39,7 +39,7 @@ enum class TooltipSeparator {
                 HEIGHT,
                 TEXTURE_WIDTH,
                 HEIGHT,
-                color.toInt() - (2 shl 23)
+//                color.toInt() - (2 shl 23)
             );
             x += WIDTH;
         }

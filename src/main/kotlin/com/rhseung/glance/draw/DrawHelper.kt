@@ -2,12 +2,17 @@ package com.rhseung.glance.draw
 
 import com.rhseung.glance.ModMain
 import com.rhseung.glance.util.Color
+import com.rhseung.glance.util.Util.getProperty
+import com.rhseung.glance.util.Util.invokeMethod
 import com.rhseung.glance.util.Util.modify
 import com.rhseung.glance.util.Util.size
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.texture.GuiAtlasManager
+import net.minecraft.client.texture.Scaling.Stretch
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier
+import java.util.function.Function
 
 object DrawHelper {
     val DOT = ModMain.id("textures/frame/default.png");     // .png 안 붙이면 오류 남
@@ -84,5 +89,29 @@ object DrawHelper {
         context.drawItem(stack, x0, y0);
         context.matrices.scale(1 / ratio, 1 / ratio, 1f);
 //        context.matrices.pop();
+    }
+
+    fun drawGuiTextureColor(
+        context: DrawContext,
+        renderLayers: Function<Identifier, RenderLayer>,
+        sprite: Identifier,
+        textureWidth: Int,
+        textureHeight: Int,
+        u: Int,
+        v: Int,
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        color: Int
+    ) {
+        val guiAtlasManager = context.getProperty<GuiAtlasManager>("guiAtlasManager");
+        val sprite2 = guiAtlasManager.getSprite(sprite);
+        val scaling = guiAtlasManager.getScaling(sprite2);
+
+        if (scaling is Stretch)
+            context.invokeMethod<Unit>("drawSpriteRegion", renderLayers, sprite2, textureWidth, textureHeight, u, v, x, y, width, height, color);
+        else
+            context.invokeMethod<Unit>("drawSpriteStretched", renderLayers, sprite2, x, y, width, height, color);
     }
 }

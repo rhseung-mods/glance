@@ -1,4 +1,4 @@
-package com.rhseung.glance.mixin;
+package com.rhseung.glance.mixin.tooltip;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.client.gui.screen.Screen;

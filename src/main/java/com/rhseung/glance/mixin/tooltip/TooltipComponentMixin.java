@@ -1,4 +1,4 @@
-package com.rhseung.glance.mixin;
+package com.rhseung.glance.mixin.tooltip;
 
 import com.rhseung.glance.tooltip.factory.TooltipComponentFactoryManager;
 import net.minecraft.client.gui.tooltip.TooltipComponent;

@@ -10,6 +10,9 @@ class SlotIcon(private val slot: Slot, index: Int = 0) : Icon(1, 9, 9, index) {
     override val id: Identifier = ModMain.id("textures/icon/slot/${slot.name.lowercase()}.png");
 
     override fun get(index: Int): Icon {
+        if (index < 0 || index >= variants)
+            throw Error("index=$index is not valid");
+
         return SlotIcon(slot, index);
     }
 

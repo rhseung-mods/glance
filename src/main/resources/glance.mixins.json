@@ -3,19 +3,22 @@
     "package": "com.rhseung.glance.mixin",
     "compatibilityLevel": "JAVA_21",
     "mixins": [
-        "EnchantmentMixin",
-        "ItemStackMixin",
-        "PotionContentsComponentMixin",
-        "SettingsMixin"
+        "tooltip.EnchantmentMixin",
+        "tooltip.ItemStackMixin",
+        "tooltip.PotionContentsComponentMixin",
+        "tooltip.SettingsMixin",
+        "network.PlayerManagerMixin",
+        "network.ServerPlayerEntityMixin"
     ],
     "injectors": {
         "defaultRequire": 1
     },
     "client": [
-        "BundleTooltipComponentMixin",
-        "DrawContextMixin",
-        "HandledScreenMixin",
-        "OrderedTextTooltipComponentMixin",
-        "TooltipComponentMixin"
+        "tooltip.BundleTooltipComponentMixin",
+        "tooltip.DrawContextMixin",
+        "tooltip.HandledScreenMixin",
+        "bar.InGameHudMixin",
+        "tooltip.OrderedTextTooltipComponentMixin",
+        "tooltip.TooltipComponentMixin",
     ]
 }

@@ -1,4 +1,4 @@
-package com.rhseung.glance.mixin;
+package com.rhseung.glance.mixin.tooltip;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.component.type.PotionContentsComponent;

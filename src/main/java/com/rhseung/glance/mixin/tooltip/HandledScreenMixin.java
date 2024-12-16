@@ -1,4 +1,4 @@
-package com.rhseung.glance.mixin;
+package com.rhseung.glance.mixin.tooltip;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.rhseung.glance.tooltip.util.TooltipUtil;

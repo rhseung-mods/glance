@@ -10,6 +10,9 @@ class SignIcon(private val path: String, index: Int = 0) : Icon(1, 5, 9, index) 
     override val id: Identifier = ModMain.id("textures/icon/sign/$path.png");
 
     override fun get(index: Int): Icon {
+        if (index < 0 || index >= variants)
+            throw Error("index=$index is not valid");
+
         return SignIcon(path, index);
     }
 

@@ -109,35 +109,19 @@ class Color {
     }
 
     fun toIntAlpha(alpha: Int): Int {
-        return (alpha.coerceIn(0, 255) shl 24) or toInt(true);
+        return (alpha.coerceIn(0, 255) shl 24) or toInt();
     }
 
     fun toTextColor(): TextColor {
         return TextColor.fromRgb(toInt());
     }
 
-    fun darker(delta: Int): Color {
-        return Color(
-            (R - delta).coerceIn(0, 255),
-            (G - delta).coerceIn(0, 255),
-            (B - delta).coerceIn(0, 255)
-        );
-    }
-
     fun darker(delta: Float): Color {
-        return darker((delta * 255).toInt());
-    }
-
-    fun brighter(delta: Int): Color {
-        return Color(
-            (R + delta).coerceIn(0, 255),
-            (G + delta).coerceIn(0, 255),
-            (B + delta).coerceIn(0, 255)
-        );
+        return Color(H, S, V - delta);
     }
 
     fun brighter(delta: Float): Color {
-        return brighter((delta * 255).toInt());
+        return Color(H, S, V + delta);
     }
 
     companion object {

@@ -2,17 +2,17 @@ package com.rhseung.glance.tooltip
 
 import com.rhseung.glance.draw.DrawableTooltip
 import com.rhseung.glance.draw.DrawableLine
-import com.rhseung.glance.draw.element.Padding
+import com.rhseung.glance.draw.element.icon.HudIcon
 import com.rhseung.glance.tooltip.base.AbstractTooltip
 import com.rhseung.glance.tooltip.factory.TooltipComponentFactoryManager
 import com.rhseung.glance.tooltip.factory.TooltipDataFactoryManager
 import com.rhseung.glance.draw.element.icon.TooltipIcon
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.font.TextRenderer
-import net.minecraft.client.gui.DrawContext
 import net.minecraft.component.DataComponentTypes
+import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.item.consume.ApplyEffectsConsumeEffect
 import kotlin.math.ceil
 
 class FoodTooltip(data: FoodTooltipData) : AbstractTooltip<FoodTooltip.FoodTooltipData>(data) {
@@ -22,22 +22,39 @@ class FoodTooltip(data: FoodTooltipData) : AbstractTooltip<FoodTooltip.FoodToolt
         val saturation = food.saturation;
         val hungerIconCount = ceil(hunger / 2.0).toInt();
         val saturationIconCount = ceil(saturation / 2.0).toInt();
+        val foodIcon: TooltipIcon;
+        val saturationIcon: TooltipIcon;
+
+        init {
+            if (stack.contains(DataComponentTypes.CONSUMABLE)) {
+                val hasHunger = stack.get(DataComponentTypes.CONSUMABLE)!!.onConsumeEffects().any { consumeEffect ->
+                    val applyEffectsConsumeEffect = (consumeEffect as? ApplyEffectsConsumeEffect) ?: return@any false;
+                    applyEffectsConsumeEffect.effects.any { it.effectType == StatusEffects.HUNGER }
+                };
+
+                foodIcon = if (hasHunger) TooltipIcon.FOOD_HUNGER else TooltipIcon.FOOD;
+                saturationIcon = if (hasHunger) TooltipIcon.SATURATION_HUNGER else TooltipIcon.SATURATION;
+            } else {
+                foodIcon = TooltipIcon.FOOD;
+                saturationIcon = TooltipIcon.SATURATION;
+            }
+        }
 
         override fun getTooltip(): DrawableTooltip {
             var hungerTooltip = DrawableLine();
             for (i in 0..<hungerIconCount) {
                 if (i == hungerIconCount - 1)
-                    hungerTooltip += TooltipIcon.HUNGER[hunger % 2];
+                    hungerTooltip += foodIcon[hunger % 2];
                 else
-                    hungerTooltip += TooltipIcon.HUNGER;
+                    hungerTooltip += foodIcon;
             }
     
             var saturationTooltip = DrawableLine();
             for (i in 0..<saturationIconCount) {
                 if (i == saturationIconCount - 1)
-                    saturationTooltip += TooltipIcon.SATURATION[ceil((saturation % 2) / 2 * 3).toInt()];
+                    saturationTooltip += saturationIcon[ceil((saturation % 2) / 2 * 3).toInt()];
                 else
-                    saturationTooltip += TooltipIcon.SATURATION;
+                    saturationTooltip += saturationIcon;
             }
 
             return DrawableTooltip(hungerTooltip, saturationTooltip);

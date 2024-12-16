@@ -10,6 +10,9 @@ class AttributeIcon(private val name: String, variants: Int = 1, index: Int = 0)
     override val id = ModMain.id("textures/icon/attribute/$name.png");
 
     override fun get(index: Int): Icon {
+        if (index < 0 || index >= variants)
+            throw Error("index=$index is not valid");
+
         return AttributeIcon(name, variants, index);
     }
 

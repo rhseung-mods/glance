@@ -26,6 +26,9 @@ abstract class Icon(
     abstract operator fun get(index: Int): Icon;
 
     override fun draw(context: DrawContext, renderer: TextRenderer, x0: Int, y0: Int): Int {
+        if (index < 0 || index >= variants)
+            throw Error("index=$index is not valid");
+
         context.drawTexture(RenderLayer::getGuiTextured, id,
             x0, y0 - 1, (width * index).toFloat(), 0f,
             width, height, width * variants, height
