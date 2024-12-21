@@ -13,6 +13,7 @@ import net.minecraft.client.texture.Scaling.Stretch
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier
 import java.util.function.Function
+import kotlin.math.abs
 
 object DrawHelper {
     val DOT = ModMain.id("textures/frame/default.png");     // .png 안 붙이면 오류 남
@@ -22,7 +23,7 @@ object DrawHelper {
         assert(!xRange.isEmpty()) { "Range must not be empty" };
 
         for (x in xRange) {
-            context.drawTexture(RenderLayer::getGuiTextured, DOT, x, y, 0f, 0f, 1, 1, 1, 1, color.toInt(true));
+            context.drawTexture(RenderLayer::getGuiTextured, DOT, x, y, 0f, 0f, 1, 1, 1, 1, color.toInt());
         }
     }
 
@@ -31,7 +32,16 @@ object DrawHelper {
 
         for (x in xRange) {
             val ratio = (x - xRange.first).toFloat() / xRange.size();
-            context.drawTexture(RenderLayer::getGuiTextured, DOT, x, y, 0f, 0f, 1, 1, 1, 1, colorFactory(ratio).toInt(true));
+            context.drawTexture(RenderLayer::getGuiTextured, DOT, x, y, 0f, 0f, 1, 1, 1, 1, colorFactory(ratio).toInt());
+        }
+    }
+
+    fun drawHorizontalLineInt(context: DrawContext, xRange: IntProgression, y: Int, colorFactory: (Float) -> Int) {
+        assert(!xRange.isEmpty()) { "Range must not be empty" };
+
+        for (x in xRange) {
+            val ratio = abs(x - xRange.first).toFloat() / xRange.size();
+            context.drawTexture(RenderLayer::getGuiTextured, DOT, x, y, 0f, 0f, 1, 1, 1, 1, colorFactory(ratio));
         }
     }
 
@@ -39,7 +49,7 @@ object DrawHelper {
         assert(!yRange.isEmpty()) { "Range must not be empty" };
 
         for (y in yRange) {
-            context.drawTexture(RenderLayer::getGuiTextured, DOT, x, y, 0f, 0f, 1, 1, 1, 1, color.toInt(true));
+            context.drawTexture(RenderLayer::getGuiTextured, DOT, x, y, 0f, 0f, 1, 1, 1, 1, color.toInt());
         }
     }
 
@@ -48,7 +58,7 @@ object DrawHelper {
 
         for (y in yRange) {
             val ratio = (y - yRange.first).toFloat() / yRange.size();
-            context.drawTexture(RenderLayer::getGuiTextured, DOT, x, y, 0f, 0f, 1, 1, 1, 1, colorFactory(ratio).toInt(true));
+            context.drawTexture(RenderLayer::getGuiTextured, DOT, x, y, 0f, 0f, 1, 1, 1, 1, colorFactory(ratio).toInt());
         }
     }
 
@@ -60,8 +70,13 @@ object DrawHelper {
     }
 
     fun drawBorder(context: DrawContext, xRange: IntRange, yRange: IntRange, z: Int, colorFactory: (Float) -> Color) {
-        drawHorizontalLine(context, xRange.modify(1, -1), yRange.first, z, colorFactory(0f));
-        drawHorizontalLine(context, xRange.modify(1, -1), yRange.last, z, colorFactory(1f));
+//        drawHorizontalLine(context, xRange.modify(1, -1), yRange.first, z, colorFactory(0f));
+//        drawHorizontalLine(context, xRange.modify(1, -1), yRange.last, z, colorFactory(1f));
+//        drawVerticalLine(context, yRange.modify(1, -1), xRange.first, z, colorFactory);
+//        drawVerticalLine(context, yRange.modify(1, -1), xRange.last, z, colorFactory);
+
+        drawHorizontalLine(context, xRange, yRange.first, z, colorFactory(0f));
+        drawHorizontalLine(context, xRange, yRange.last, z, colorFactory(1f));
         drawVerticalLine(context, yRange.modify(1, -1), xRange.first, z, colorFactory);
         drawVerticalLine(context, yRange.modify(1, -1), xRange.last, z, colorFactory);
     }
@@ -74,7 +89,7 @@ object DrawHelper {
         
 //        context.matrices.push();
         context.matrices.translate(0f, 0f, z.toFloat());
-        context.drawGuiTexture(RenderLayer::getGuiTextured, sprite, xRange.first, yRange.first, xRange.size(),yRange.size(), color.toInt(true));
+        context.drawGuiTexture(RenderLayer::getGuiTextured, sprite, xRange.first, yRange.first, xRange.size(),yRange.size(), color.toInt());
 //        context.matrices.pop();
     }
 

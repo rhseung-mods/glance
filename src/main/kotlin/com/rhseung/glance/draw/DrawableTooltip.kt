@@ -1,13 +1,13 @@
 package com.rhseung.glance.draw
 
 import com.rhseung.glance.draw.element.Padding
-import com.rhseung.glance.util.Vec2D
+import com.rhseung.glance.util.Vec2d
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 
 class DrawableTooltip(vararg val lines: DrawableLine) {
-    fun draw(context: DrawContext, renderer: TextRenderer, x0: Int, y0: Int): Vec2D {
-        var cursor = Vec2D(x0, y0);
+    fun draw(context: DrawContext, renderer: TextRenderer, x0: Int, y0: Int): Vec2d {
+        var cursor = Vec2d(x0, y0);
 
         lines.forEach { line ->
             cursor = line.draw(context, renderer, cursor.x, cursor.y);

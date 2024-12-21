@@ -30,7 +30,7 @@ abstract class Icon(
             throw Error("index=$index is not valid");
 
         context.drawTexture(RenderLayer::getGuiTextured, id,
-            x0, y0 - 1, (width * index).toFloat(), 0f,
+            x0, y0, (width * index).toFloat(), 0f,
             width, height, width * variants, height
         );
 

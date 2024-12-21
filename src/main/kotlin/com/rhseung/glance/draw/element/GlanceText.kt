@@ -16,7 +16,7 @@ class GlanceText(
 ) : Drawable, Text {
 
     override fun draw(context: DrawContext, renderer: TextRenderer, x0: Int, y0: Int): Int {
-        context.drawText(renderer, content, x0, y0, color?.toInt() ?: -1, true);
+        context.drawText(renderer, content, x0, y0 + 1, color?.rgb() ?: -1, true);
         return x0 + getWidth(renderer);
     }
 
@@ -25,12 +25,12 @@ class GlanceText(
     }
 
     override fun getHeight(textRenderer: TextRenderer): Int {
-        return textRenderer.fontHeight;
+        return textRenderer.fontHeight - 1;
     }
 
     override fun getStyle(): Style {
         return if (color != null)
-            Style.EMPTY.withColor(color.toInt());
+            Style.EMPTY.withColor(color.rgb());
         else
             Style.EMPTY;
     }
@@ -48,8 +48,8 @@ class GlanceText(
     }
 
     companion object {
-        infix fun String.with(color: Color): GlanceText {
-            return GlanceText(this, color);
+        infix fun String.with(color: Color): Text {
+            return Text.literal(this).withColor(color.rgb());
         }
 
         fun Text.toGlanceText(): GlanceText {

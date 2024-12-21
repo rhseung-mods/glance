@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 @Mixin(ItemStack.class)
 public class ItemStackMixin {
     /**
-     * {@link com.rhseung.glance.tooltip.EnchantedBookTooltip} 에서 대체됨
+     * {@link com.rhseung.glance.legacy_tooltip.EnchantedBookTooltip} 에서 대체됨
      */
     @WrapWithCondition(
         method = "getTooltip(Lnet/minecraft/item/Item$TooltipContext;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/tooltip/TooltipType;)Ljava/util/List;",

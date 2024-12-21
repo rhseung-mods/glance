@@ -1,12 +1,15 @@
 package com.rhseung.glance.mixin.tooltip;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.rhseung.glance.tooltip.util.TooltipUtil;
+import com.rhseung.glance.legacy_tooltip.util.TooltipUtil;
+import com.rhseung.glance.tooltip.Tooltip;
+import com.rhseung.glance.tooltip.component.TextComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipData;
 import net.minecraft.text.Text;
@@ -28,10 +31,11 @@ public class HandledScreenMixin {
             )
     )
     public void drawTooltipRedirect(DrawContext context, TextRenderer textRenderer, List<Text> text, Optional<TooltipData> data, int mouseX, int mouseY, Identifier texture, @Local ItemStack stack) {
-        TooltipUtil.INSTANCE.drawTooltipText(
-            context, textRenderer, text,
-            TooltipUtil.INSTANCE.getTooltipDataWithClient(stack, MinecraftClient.getInstance()),
-            mouseX, mouseY, HoveredTooltipPositioner.INSTANCE, stack
-        );
+        List<TooltipComponent> components = new java.util.ArrayList<>(List.of());
+        if (!text.isEmpty())
+            components.addAll(text.stream().map(TextComponent::new).toList());
+        data.ifPresent(tooltipData -> components.add(TooltipComponent.of(tooltipData)));
+
+        Tooltip.INSTANCE.draw(context, textRenderer, components, HoveredTooltipPositioner.INSTANCE, mouseX, mouseY, stack);
     }
 }

@@ -1,6 +1,10 @@
 package com.rhseung.glance.mixin.tooltip;
 
-import com.rhseung.glance.tooltip.util.TooltipUtil;
+import com.rhseung.glance.legacy_tooltip.util.TooltipUtil;
+import com.rhseung.glance.tooltip.Tooltip;
+import com.rhseung.glance.tooltip.component.GlanceTooltipComponent;
+import com.rhseung.glance.tooltip.component.TextComponent;
+import com.rhseung.glance.tooltip.content.TooltipContentRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -9,8 +13,6 @@ import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipPositioner;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.texture.GuiAtlasManager;
-import net.minecraft.client.texture.Sprite;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipData;
 import net.minecraft.text.Text;
@@ -23,7 +25,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Mixin(DrawContext.class)
 public abstract class DrawContextMixin {
@@ -35,16 +36,15 @@ public abstract class DrawContextMixin {
         cancellable = true
     )
     public void drawItemTooltipMixin(TextRenderer textRenderer, ItemStack stack, int x, int y, CallbackInfo ci) {
-        DrawContext context = (DrawContext) (Object) this;
+        List<TooltipComponent> components = new java.util.ArrayList<>(List.of());
+        List<Text> texts = Screen.getTooltipFromItem(MinecraftClient.getInstance(), stack);
+        if (!texts.isEmpty())
+            components.addAll(texts.stream().map(TextComponent::new).toList());
+        if (stack.getTooltipData().isPresent())
+            components.add(TooltipComponent.of(stack.getTooltipData().get()));
 
-        TooltipUtil.INSTANCE.drawTooltipText(
-            context, textRenderer,
-            Screen.getTooltipFromItem(MinecraftClient.getInstance(), stack),
-            stack.getTooltipData(),
-            x, y,
-            HoveredTooltipPositioner.INSTANCE,
-            stack
-        );
+        DrawContext context = (DrawContext) (Object) this;
+        Tooltip.INSTANCE.draw(context, textRenderer, components, HoveredTooltipPositioner.INSTANCE, x, y, stack);
 
         ci.cancel();
     }
@@ -55,11 +55,35 @@ public abstract class DrawContextMixin {
         cancellable = true
     )
     public void drawTooltipMixin(TextRenderer textRenderer, List<Text> text, Optional<TooltipData> data, int x, int y, Identifier texture, CallbackInfo ci) {
-        DrawContext context = (DrawContext) (Object) this;
+        List<TooltipComponent> components = new java.util.ArrayList<>(List.of());
+        if (!text.isEmpty())
+            components.addAll(text.stream().map(TextComponent::new).toList());
+        data.ifPresent(tooltipData -> components.add(TooltipComponent.of(tooltipData)));
 
-        TooltipUtil.INSTANCE.drawTooltipText(
-            context, textRenderer, text, data, x, y, HoveredTooltipPositioner.INSTANCE, null
-        );
+        DrawContext context = (DrawContext) (Object) this;
+        Tooltip.INSTANCE.draw(context, textRenderer, components, HoveredTooltipPositioner.INSTANCE, x, y, null);
+
+        ci.cancel();
+    }
+
+    @Inject(
+        method = "drawTooltip(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IILnet/minecraft/util/Identifier;)V",
+        at = @At("HEAD"),
+        cancellable = true
+    )
+    public void drawTooltipMixin(TextRenderer textRenderer, Text text, int x, int y, Identifier texture, CallbackInfo ci) {
+        drawTooltipMixin(textRenderer, List.of(text), x, y, texture, ci);
+    }
+
+    @Inject(
+        method = "drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/util/Identifier;)V",
+        at = @At("HEAD"),
+        cancellable = true
+    )
+    public void drawTooltipMixin(TextRenderer textRenderer, List<Text> text, int x, int y, Identifier texture, CallbackInfo ci) {
+        List<TooltipComponent> components = new java.util.ArrayList<>(text.stream().map(TextComponent::new).toList());
+        DrawContext context = (DrawContext) (Object) this;
+        Tooltip.INSTANCE.draw(context, textRenderer, components, HoveredTooltipPositioner.INSTANCE, x, y, null);
 
         ci.cancel();
     }
@@ -71,10 +95,7 @@ public abstract class DrawContextMixin {
     )
     private void drawTooltipMixin(TextRenderer textRenderer, List<TooltipComponent> components, int x, int y, TooltipPositioner positioner, Identifier texture, CallbackInfo ci) {
         DrawContext context = (DrawContext) (Object) this;
-
-        TooltipUtil.INSTANCE.drawTooltip(
-            context, textRenderer, components, x, y, positioner, null
-        );
+        Tooltip.INSTANCE.draw(context, textRenderer, components, positioner, x, y, null);
 
         ci.cancel();
     }

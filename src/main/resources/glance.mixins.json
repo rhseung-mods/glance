@@ -18,7 +18,6 @@
         "tooltip.DrawContextMixin",
         "tooltip.HandledScreenMixin",
         "bar.InGameHudMixin",
-        "tooltip.OrderedTextTooltipComponentMixin",
-        "tooltip.TooltipComponentMixin",
+        "tooltip.OrderedTextTooltipComponentMixin"
     ]
 }

@@ -12,8 +12,12 @@ import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.text.OrderedText
+import net.minecraft.text.Text
 import java.lang.reflect.Field
 import java.lang.reflect.Method
+import kotlin.math.abs
+import kotlin.math.ceil
 
 object Util {
     fun Double.roundTo(n: Int) = "%.${n}f".format(this).toDouble();
@@ -27,13 +31,15 @@ object Util {
     // TODO: x0Hover..(x0Hover + tooltipWidth) => x0Hover with tooltipWidth
     fun Int.toRangeSize(size: Int) = this..<(this + size);
 
-    fun IntRange.modify(startDelta: Int, endDelta: Int) = (this.start + startDelta)..(this.endInclusive + endDelta);
+    fun IntRange.modify(startDelta: Int, endDelta: Int) = (this.first + startDelta)..(this.last + endDelta);
 
-    fun IntRange.size() = this.endExclusive - this.start;
+    fun IntRange.size() = this.endExclusive - this.first;
+
+    fun IntProgression.size() = abs((this.last - this.first) / this.step) + 1;
 
     fun IntRange.splitToTwo(): Pair<IntRange, IntRange> {
-        val mid = (this.start + this.endInclusive) / 2;
-        return this.start..mid to (mid + 1)..this.endInclusive;
+        val mid = (this.first + this.last) / 2;
+        return this.first..mid to (mid + 1)..this.last;
     }
 
     fun <T> Boolean.ifElse(ifTrue: T, ifFalse: T): T = if (this) ifTrue else ifFalse;
@@ -53,6 +59,21 @@ object Util {
             action(item);
         }
     }
+
+    fun <T> Iterable<T>.joinTo(separator: T): List<T> {
+        val list = mutableListOf<T>()
+        for (item in this) {
+            list.add(item);
+            list.add(separator);
+        }
+        if (list.isNotEmpty())
+            list.removeLast();
+        return list;
+    }
+
+    fun ceilToInt(value: Float) = ceil(value).toInt();
+
+    fun ceilToInt(value: Double) = ceil(value).toInt();
 
     @Throws(NoSuchFieldException::class)
     private fun getField(clazz: Class<*>, fieldName: String): Field {
@@ -146,6 +167,19 @@ object Util {
 
     fun <T> Any.invokeMethod(methodName: String, vararg args: Any?): T {
         return invoke(this, methodName, *args)
+    }
+
+    fun OrderedText.toText(): Text {
+        val mutableTextArr = mutableListOf(Text.empty());
+        this.accept { idx, style, c ->
+            mutableTextArr[0] = mutableTextArr[0].append(Text.literal(Character.toString(c)).setStyle(style));
+            true;
+        }
+        return mutableTextArr[0];
+    }
+
+    fun <E> List<E>.safeGet(idx: Int): E? {
+        return if (idx in this.indices) this[idx] else null;
     }
 
     fun defaultAttribute(

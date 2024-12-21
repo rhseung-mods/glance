@@ -13,7 +13,7 @@ import kotlin.math.ceil
 
 object HealthHud {
     private fun shine(context: DrawContext, heartX: Int, heartY: Int) {
-        context.fill(heartX + 2, heartY + 2, heartX + 3, heartY + 3, Color.WHITE.toIntAlpha(200));
+        context.fill(heartX + 2, heartY + 2, heartX + 3, heartY + 3, Color.WHITE.toInt(200));
     }
 
     private fun drawHeart(
@@ -32,7 +32,7 @@ object HealthHud {
         val isHalf = (accHealth + 1 == targetHealth).toInt();
 
         if (heartIcon == null) {
-            HudIcon.HEART[isHalf].draw(context, textRenderer, x, y, color.toInt(true));
+            HudIcon.HEART[isHalf].draw(context, textRenderer, x, y, color.toInt());
 
             if (!isHardcore)
                 shine(context, x, y);

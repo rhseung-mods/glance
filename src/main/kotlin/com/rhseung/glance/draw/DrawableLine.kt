@@ -3,18 +3,18 @@ package com.rhseung.glance.draw
 import com.rhseung.glance.draw.element.Padding
 import com.rhseung.glance.draw.element.GlanceText
 import com.rhseung.glance.draw.element.StackDisplay
-import com.rhseung.glance.util.Vec2D
+import com.rhseung.glance.util.Vec2d
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 
 class DrawableLine(vararg val drawables: Drawable) {
-    fun draw(context: DrawContext, renderer: TextRenderer, x0: Int, y0: Int): Vec2D {
+    fun draw(context: DrawContext, renderer: TextRenderer, x0: Int, y0: Int): Vec2d {
         var x = x0;
         drawables.forEach { x = it.draw(context, renderer, x, y0); }
 
         assert(x == x0 + getWidth(renderer));
-        return Vec2D(x, y0 + getHeight(renderer));
+        return Vec2d(x, y0 + getHeight(renderer));
     }
 
     fun getWidth(textRenderer: TextRenderer): Int {

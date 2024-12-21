@@ -26,6 +26,7 @@ class Color {
         this.R = R.coerceIn(0, 255)
         this.G = G.coerceIn(0, 255)
         this.B = B.coerceIn(0, 255)
+
         val r = this.R / 255.0F
         val g = this.G / 255.0F
         val b = this.B / 255.0F
@@ -99,21 +100,32 @@ class Color {
 
     constructor(rgb: Int) : this((rgb shr 16) and 0xFF, (rgb shr 8) and 0xFF, rgb and 0xFF);
 
+    fun rgb(): Int {
+        return (R shl 16) or (G shl 8) or B;
+    }
+
+    fun argb(alpha: Int): Int {
+        return (alpha shl 24) or rgb();
+    }
+
+    fun zeroAlpha(): Int {
+        return argb(0);
+    }
+
+    fun fullAlpha(): Int {
+        return argb(255);
+    }
+
+    fun withAlpha(alpha: Int): Int {
+        return argb(alpha);
+    }
+
+    fun toInt(alpha: Int = 255): Int {
+        return argb(alpha);
+    }
+
     override fun toString(): String {
-        return Integer.toHexString(1 shl 24 or (R shl 16) or (G shl 8) or B).substring(1);
-    }
-
-    fun toInt(shift: Boolean = false): Int {
-        return if (!shift) Integer.parseInt(toString(), 16)
-        else Integer.parseInt(toString(), 16) - (2 shl 23);     // and 0xFFFFFF 했더니 아무것도 안 나옴. 찾는데 한 2시간 걸림. 하지마라...
-    }
-
-    fun toIntAlpha(alpha: Int): Int {
-        return (alpha.coerceIn(0, 255) shl 24) or toInt();
-    }
-
-    fun toTextColor(): TextColor {
-        return TextColor.fromRgb(toInt());
+        return "#${Integer.toHexString(rgb())}";
     }
 
     fun darker(delta: Float): Color {
@@ -125,28 +137,32 @@ class Color {
     }
 
     companion object {
+        fun empty(): Int {
+            return Color.WHITE.argb(0);    // -1와 동일
+        }
+
         val WOOD = Color(150, 116, 65);
         val STONE = Color(149, 145, 141);
         val IRON = Color(215, 215, 215);
         val DIAMOND = Color(110, 236, 210);
         val NETHERITE = Color(98, 88, 89);
 
-        val BLACK = Color(0);
-        val DARK_BLUE = Color(170);
-        val DARK_GREEN = Color(43520);
-        val DARK_AQUA = Color(43690);
-        val DARK_RED = Color(11141120);
-        val DARK_PURPLE = Color(11141290);
-        val GOLD = Color(16755200);
-        val GRAY = Color(11184810);
-        val DARK_GRAY = Color(5592405);
-        val BLUE = Color(5592575);
-        val GREEN = Color(5635925);
-        val AQUA = Color(5636095);
-        val RED = Color(16733525);
-        val LIGHT_PURPLE = Color(16733695);
-        val YELLOW = Color(16777045);
-        val WHITE = Color(16777215);
+        val BLACK = Color(0x000000);
+        val DARK_BLUE = Color(0x0000AA);
+        val DARK_GREEN = Color(0x00AA00);
+        val DARK_AQUA = Color(0x00AAAA);
+        val DARK_RED = Color(0xAA0000);
+        val DARK_PURPLE = Color(0xAA00AA);
+        val GOLD = Color(0xFFAA00);
+        val GRAY = Color(0xAAAAAA);
+        val DARK_GRAY = Color(0x555555);
+        val BLUE = Color(0x5555FF);
+        val GREEN = Color(0x55FF55);
+        val AQUA = Color(0x55FFFF);
+        val RED = Color(0xFF5555);
+        val LIGHT_PURPLE = Color(0xFF55FF);
+        val YELLOW = Color(0xFFFF55);
+        val WHITE = Color(0xFFFFFF);
 
         val FUEL = Color(0xE9B83B);
 
@@ -185,7 +201,7 @@ class Color {
             Formatting.LIGHT_PURPLE -> LIGHT_PURPLE
             Formatting.YELLOW -> YELLOW
             Formatting.WHITE -> WHITE
-            else -> error("Formatting Modifier cannot be converted to Color")
+            else -> error("Formatting($this) cannot be converted to color")
         }
     }
 }

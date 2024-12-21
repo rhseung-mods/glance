@@ -1,10 +1,12 @@
 package com.rhseung.glance
 
-import com.rhseung.glance.draw.DrawHelper
 import com.rhseung.glance.network.ServerSyncHandler
 import com.rhseung.glance.test.GlanceTestItems
-import com.rhseung.glance.tooltip.*
-import com.rhseung.glance.tooltip.base.CompoundTooltip
+import com.rhseung.glance.legacy_tooltip.*
+import com.rhseung.glance.tooltip.content.AttributeContent
+import com.rhseung.glance.tooltip.content.EnchantmentContent
+import com.rhseung.glance.tooltip.content.FoodContent
+import com.rhseung.glance.tooltip.content.FuelContent
 import net.fabricmc.api.ModInitializer
 import net.minecraft.util.Identifier
 import org.slf4j.LoggerFactory
@@ -16,13 +18,11 @@ object ModMain : ModInitializer {
 	fun id(path: String): Identifier = Identifier.of(MOD_ID, path);
 
 	override fun onInitialize() {
-		// tooltip
-		CompoundTooltip.register();
-		AttributeTooltip.register();
-		FoodTooltip.register();
-		FuelTooltip.register();
-		EnchantedBookTooltip.register();
-		ArmorModelTooltip.register();
+		// tooltip content
+		AttributeContent.register();
+		EnchantmentContent.register();
+		FoodContent.register();
+		FuelContent.register();
 
 		// network
 		ServerSyncHandler.registerS2CPayloads();
