@@ -1,7 +1,7 @@
-package com.rhseung.glance.draw.element.icon
+package com.rhseung.glance.util.icon
 
 import com.rhseung.glance.ModMain
-import com.rhseung.glance.draw.element.Icon
+import com.rhseung.glance.util.Icon
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier

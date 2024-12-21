@@ -1,8 +1,8 @@
-package com.rhseung.glance.draw.element.icon
+package com.rhseung.glance.util.icon
 
 import com.rhseung.glance.ModMain
 import com.rhseung.glance.draw.DrawHelper
-import com.rhseung.glance.draw.element.Icon
+import com.rhseung.glance.util.Icon
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer

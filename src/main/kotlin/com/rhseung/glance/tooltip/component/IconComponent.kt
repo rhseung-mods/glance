@@ -1,6 +1,6 @@
 package com.rhseung.glance.tooltip.component
 
-import com.rhseung.glance.draw.element.Icon
+import com.rhseung.glance.util.Icon
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 

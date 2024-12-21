@@ -1,7 +1,7 @@
-package com.rhseung.glance.draw.element.icon
+package com.rhseung.glance.util.icon
 
 import com.rhseung.glance.ModMain
-import com.rhseung.glance.draw.element.Icon
+import com.rhseung.glance.util.Icon
 import com.rhseung.glance.util.Slot
 import net.minecraft.component.type.AttributeModifierSlot
 import net.minecraft.util.Identifier

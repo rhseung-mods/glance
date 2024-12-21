@@ -2,10 +2,9 @@ package com.rhseung.glance.tooltip.content
 
 import com.rhseung.glance.draw.element.GlanceText.Companion.with
 import com.rhseung.glance.draw.element.Padding
-import com.rhseung.glance.draw.element.icon.AttributeIcon.Companion.toIcon
-import com.rhseung.glance.draw.element.icon.SignIcon
-import com.rhseung.glance.draw.element.icon.SignIcon.Companion.toSignIcon
-import com.rhseung.glance.draw.element.icon.SlotIcon.Companion.toIcon
+import com.rhseung.glance.util.icon.AttributeIcon.Companion.toIcon
+import com.rhseung.glance.util.icon.SignIcon
+import com.rhseung.glance.util.icon.SignIcon.Companion.toSignIcon
 import com.rhseung.glance.legacy_tooltip.util.SpecialChar
 import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.IconComponent
@@ -18,6 +17,7 @@ import com.rhseung.glance.util.Slot
 import com.rhseung.glance.util.Slot.Companion.toSlot
 import com.rhseung.glance.util.Util
 import com.rhseung.glance.util.Util.toStringPretty
+import com.rhseung.glance.util.icon.SlotIcon.Companion.toIcon
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.component.DataComponentTypes

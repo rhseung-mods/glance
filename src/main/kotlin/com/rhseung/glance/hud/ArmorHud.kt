@@ -1,12 +1,10 @@
 package com.rhseung.glance.hud
 
-import com.rhseung.glance.draw.element.icon.HudIcon
-import com.rhseung.glance.draw.element.icon.HudIcon.Companion.ARMOR_LEATHER
-import com.rhseung.glance.draw.element.icon.HudIcon.Companion.TOUGHNESS
-import com.rhseung.glance.draw.element.icon.HudIcon.Companion.equipmentModelToIcon
+import com.rhseung.glance.util.icon.HudIcon
+import com.rhseung.glance.util.icon.HudIcon.Companion.ARMOR_LEATHER
+import com.rhseung.glance.util.icon.HudIcon.Companion.equipmentModelToIcon
 import com.rhseung.glance.util.Util.forEachRight
 import com.rhseung.glance.util.Util.getEquipmentSlot
-import com.rhseung.glance.util.Util.mapRight
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer
@@ -19,7 +17,6 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.ColorHelper
-import kotlin.math.ceil
 import kotlin.math.floor
 
 object ArmorHud {

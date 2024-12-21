@@ -1,4 +1,4 @@
-package com.rhseung.glance.draw.element
+package com.rhseung.glance.util
 
 import com.rhseung.glance.draw.Drawable
 import com.rhseung.glance.draw.DrawableLine

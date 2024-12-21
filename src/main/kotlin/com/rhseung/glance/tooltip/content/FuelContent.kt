@@ -1,7 +1,7 @@
 package com.rhseung.glance.tooltip.content
 
 import com.rhseung.glance.draw.element.GlanceText.Companion.with
-import com.rhseung.glance.draw.element.icon.TooltipIcon
+import com.rhseung.glance.util.icon.TooltipIcon
 import com.rhseung.glance.legacy_tooltip.util.SpecialChar
 import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.IconComponent

@@ -1,23 +1,24 @@
 {
-    "required": true,
-    "package": "com.rhseung.glance.mixin",
-    "compatibilityLevel": "JAVA_21",
-    "mixins": [
-        "tooltip.EnchantmentMixin",
-        "tooltip.ItemStackMixin",
-        "tooltip.PotionContentsComponentMixin",
-        "tooltip.SettingsMixin",
-        "network.PlayerManagerMixin",
-        "network.ServerPlayerEntityMixin"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    },
-    "client": [
-        "tooltip.BundleTooltipComponentMixin",
-        "tooltip.DrawContextMixin",
-        "tooltip.HandledScreenMixin",
-        "bar.InGameHudMixin",
-        "tooltip.OrderedTextTooltipComponentMixin"
-    ]
+  "required": true,
+  "package": "com.rhseung.glance.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "network.PlayerManagerMixin",
+    "network.ServerPlayerEntityMixin",
+    "tooltip.EnchantmentMixin",
+    "tooltip.ItemStackMixin",
+    "tooltip.PotionContentsComponentMixin",
+    "tooltip.SettingsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "MinecraftClientMixin",
+    "bar.InGameHudMixin",
+    "tooltip.BundleTooltipComponentMixin",
+    "tooltip.DrawContextMixin",
+    "tooltip.HandledScreenMixin",
+    "tooltip.OrderedTextTooltipComponentMixin"
+  ]
 }

@@ -1,6 +1,7 @@
 package com.rhseung.glance.tooltip.template
 
 import com.rhseung.glance.tooltip.TooltipDecor
+import com.rhseung.glance.tooltip.component.Armor3DBoxComponent
 import com.rhseung.glance.tooltip.component.ItemStackBoxComponent
 import com.rhseung.glance.tooltip.component.CenteredLineComponent
 import com.rhseung.glance.tooltip.component.CenteredTextComponent
@@ -12,6 +13,7 @@ import com.rhseung.glance.tooltip.component.YPaddingComponent
 import com.rhseung.glance.util.Color
 import com.rhseung.glance.util.Util.joinTo
 import net.minecraft.client.gui.tooltip.TooltipComponent
+import net.minecraft.item.ArmorItem
 import net.minecraft.item.ItemStack
 
 class DetailTooltip(
@@ -29,7 +31,7 @@ class DetailTooltip(
         tooltip = mutableListOf(
             YPaddingComponent(3),
             CenteredLineComponent(
-                ItemStackBoxComponent(stack, 16, 16, theme),
+                if (stack.item !is ArmorItem) ItemStackBoxComponent(stack, 16, 16, theme) else Armor3DBoxComponent(stack, 16, 16, theme),
                 XPaddingComponent(3),
                 CenteredTextComponent(stack.formattedName)
             ),
