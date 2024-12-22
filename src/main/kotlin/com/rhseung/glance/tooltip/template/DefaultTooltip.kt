@@ -26,7 +26,7 @@ class DefaultTooltip(
     init {
         tooltip = mutableListOf(
             YPaddingComponent(2),
-            *this.titles.joinTo(YPaddingComponent(2)).toTypedArray(),
+            *this.titles.map { it.withTheme(theme) }.joinTo(YPaddingComponent(2)).toTypedArray(),
             YPaddingComponent(2),
         );
 

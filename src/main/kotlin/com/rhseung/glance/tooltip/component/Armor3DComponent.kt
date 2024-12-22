@@ -1,6 +1,5 @@
 package com.rhseung.glance.tooltip.component
 
-import com.rhseung.glance.tooltip.TooltipDecor
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
@@ -9,19 +8,14 @@ import net.minecraft.component.DataComponentTypes
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.item.ItemStack
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import kotlin.math.PI
 import kotlin.math.atan
 
-class Armor3DBoxComponent(
-    val itemStack: ItemStack,
-    val width: Int,
-    val height: Int,
-    val theme: TooltipDecor.Theme
+class Armor3DComponent(
+    val itemStack: ItemStack
 ) : GlanceTooltipComponent {
 
     companion object {
@@ -35,11 +29,11 @@ class Armor3DBoxComponent(
     }
 
     override fun getWidth(textRenderer: TextRenderer): Int {
-        return width + 2;
+        return 16 + 2;
     }
 
     override fun getHeight(textRenderer: TextRenderer): Int {
-        return height + 2;
+        return 16 + 2;
     }
 
     override fun draw(
@@ -52,20 +46,6 @@ class Armor3DBoxComponent(
     ) {
         val innerx = x0 + 1;
         val innery = y0 + 1;
-
-        context.matrices.push();
-
-        // bg
-        context.fill(innerx, innery, innerx + width, innery + height, 400, theme.bgColor1.toInt(200));
-        // top
-        context.fill(innerx, innery - 1, innerx + width, innery, 400, theme.outlineColor1.toInt(150));
-        // bottom
-        context.fill(innerx, innery + height, innerx + width, innery + height + 1, 400, theme.outlineColor1.toInt(150));
-        // left
-        context.fill(innerx - 1, innery, innerx, innery + height, 400, theme.outlineColor1.toInt(150));
-        // right
-        context.fill(innerx + width, innery, innerx + width + 1, innery + height, 400, theme.outlineColor1.toInt(150));
-        context.matrices.pop();
 
         // item
         val client = MinecraftClient.getInstance();
@@ -95,11 +75,11 @@ class Armor3DBoxComponent(
         entityRenderDispatcher.rotation = quaternionf2;
 
         val deltaY = when (slot) {
-            EquipmentSlot.HEAD -> 34
-            EquipmentSlot.CHEST -> 22
-            EquipmentSlot.LEGS -> 16
+            EquipmentSlot.HEAD -> 33
+            EquipmentSlot.CHEST -> 21
+            EquipmentSlot.LEGS -> 15
             EquipmentSlot.FEET -> 10
-            else -> 22
+            else -> 21
         };
 
         var scale = when (slot) {
@@ -111,7 +91,7 @@ class Armor3DBoxComponent(
         };
 
         context.matrices.push();
-        context.matrices.translate(innerx.toFloat() + 8, innery.toFloat() + deltaY, 400f);
+        context.matrices.translate(innerx.toFloat() + 7, innery.toFloat() + deltaY, 400f);
         context.matrices.multiplyPositionMatrix(Matrix4f().scaling(scale, scale, -scale));
         context.matrices.multiply(quaternionf);
 

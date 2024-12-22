@@ -55,15 +55,17 @@ object Tooltip {
             TooltipContentRegistry.find(stack.item, stack).forEach { everyComponents.addAll(titleEndIdx, it.getComponents()) }
 
         val titleComponents: List<TextComponent> = everyComponents.subList(0, titleEndIdx) as? List<TextComponent> ?: error("Title components must be TextComponent");
-        val components: List<TooltipComponent> = everyComponents.subList(titleEndIdx, everyComponents.size);
+        var components: List<TooltipComponent> = everyComponents.subList(titleEndIdx, everyComponents.size);
 
         if (titleComponents.isEmpty())
             return;
 
-        val textColor = titleComponents[0].text.style.color ?: titleComponents[0].text.siblings.safeGet(0)?.style?.color;
-        val color = Color(textColor?.rgb ?: -1);
+        components = components.dropWhile { it is TextComponent && it.text.string.isEmpty() };
 
-        // TODO: theme 놀이
+        val firstTitle = titleComponents[0].text.asOrderedText().toText();
+        val textColor = firstTitle.style.color ?: firstTitle.siblings.safeGet(0)?.style?.color;
+        val color = if (textColor?.rgb != null) Color(textColor.rgb) else null;
+
         val theme: TooltipDecor.Theme =
         if (stack != null) {
             val id = Registries.ITEM.getId(stack.item);
@@ -77,9 +79,13 @@ object Tooltip {
             else if ("gold" in id.path)
                 TooltipDecor.Themes.GOLD;
             else if ("iron" in id.path)
-                TooltipDecor.Themes.SILVER;
+                TooltipDecor.Themes.IRON;
+            else if ("netherite" in id.path)
+                TooltipDecor.Themes.NETHERITE;
             else if ("ender" in id.path)
                 TooltipDecor.Themes.ENDER;
+            else if ("sculk" in id.path || "echo" in id.path)
+                TooltipDecor.Themes.ECHO;
             else when (stack.rarity) {
                 Rarity.COMMON -> TooltipDecor.Themes.DEFAULT;
                 Rarity.UNCOMMON -> TooltipDecor.Themes.UNCOMMON;
@@ -87,7 +93,10 @@ object Tooltip {
                 Rarity.EPIC -> TooltipDecor.Themes.EPIC;
             }
         } else {
-            TooltipDecor.Theme(color);
+            if (color != null)
+                TooltipDecor.Theme(color);
+            else
+                TooltipDecor.Themes.DEFAULT;
         }
 
         val tooltip = if (stack != null && Screen.hasShiftDown())

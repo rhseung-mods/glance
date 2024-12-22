@@ -1,16 +1,20 @@
 package com.rhseung.glance.tooltip.template
 
 import com.rhseung.glance.tooltip.TooltipDecor
-import com.rhseung.glance.tooltip.component.Armor3DBoxComponent
-import com.rhseung.glance.tooltip.component.ItemStackBoxComponent
+import com.rhseung.glance.tooltip.component.Armor3DComponent
+import com.rhseung.glance.tooltip.component.BoxComponent
 import com.rhseung.glance.tooltip.component.CenteredLineComponent
 import com.rhseung.glance.tooltip.component.CenteredTextComponent
+import com.rhseung.glance.tooltip.component.ItemStackComponent
 import com.rhseung.glance.tooltip.component.LineComponent
 import com.rhseung.glance.tooltip.component.SeparatorComponent
+import com.rhseung.glance.tooltip.component.ShiftedComponent
+import com.rhseung.glance.tooltip.component.StackedComponent
 import com.rhseung.glance.tooltip.component.TextComponent
 import com.rhseung.glance.tooltip.component.XPaddingComponent
 import com.rhseung.glance.tooltip.component.YPaddingComponent
 import com.rhseung.glance.util.Color
+import com.rhseung.glance.util.Util.ifElse
 import com.rhseung.glance.util.Util.joinTo
 import net.minecraft.client.gui.tooltip.TooltipComponent
 import net.minecraft.item.ArmorItem
@@ -31,9 +35,14 @@ class DetailTooltip(
         tooltip = mutableListOf(
             YPaddingComponent(3),
             CenteredLineComponent(
-                if (stack.item !is ArmorItem) ItemStackBoxComponent(stack, 16, 16, theme) else Armor3DBoxComponent(stack, 16, 16, theme),
+                StackedComponent(
+                    BoxComponent(16, 16, theme),
+                    ShiftedComponent((stack.item is ArmorItem)
+                        .ifElse(Armor3DComponent(stack), ItemStackComponent(stack, 16)),
+                    1, 1)
+                ),
                 XPaddingComponent(3),
-                CenteredTextComponent(stack.formattedName)
+                CenteredTextComponent(stack.formattedName, theme)
             ),
             YPaddingComponent(3),
         )

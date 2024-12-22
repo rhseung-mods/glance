@@ -2,7 +2,7 @@ package com.rhseung.glance
 
 import com.rhseung.glance.event.RenderTickEvents
 import com.rhseung.glance.network.ClientSyncHandler
-import com.rhseung.glance.tooltip.component.Armor3DBoxComponent
+import com.rhseung.glance.tooltip.component.Armor3DComponent
 import net.fabricmc.api.ClientModInitializer
 
 object ModClient : ClientModInitializer {
@@ -12,7 +12,7 @@ object ModClient : ClientModInitializer {
         // event
         RenderTickEvents.EVENT.register(object : RenderTickEvents {
             override fun tick() {
-                Armor3DBoxComponent.updateTimer();
+                Armor3DComponent.updateTimer();
             }
         });
     }
