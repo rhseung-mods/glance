@@ -1,23 +1,22 @@
 package com.rhseung.glance.tooltip.content
 
-import com.rhseung.glance.draw.element.GlanceText.Companion.with
-import com.rhseung.glance.draw.element.Padding
-import com.rhseung.glance.util.icon.AttributeIcon.Companion.toIcon
-import com.rhseung.glance.util.icon.SignIcon
-import com.rhseung.glance.util.icon.SignIcon.Companion.toSignIcon
-import com.rhseung.glance.legacy_tooltip.util.SpecialChar
-import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
-import com.rhseung.glance.tooltip.component.IconComponent
-import com.rhseung.glance.tooltip.component.LineComponent
-import com.rhseung.glance.tooltip.component.TextComponent
-import com.rhseung.glance.tooltip.component.XPaddingComponent
+import com.rhseung.glance.tooltip.TooltipConstants
+import com.rhseung.glance.tooltip.TooltipConstants.Padding.BETWEEN_SIGN_VALUE
+import com.rhseung.glance.tooltip.TooltipConstants.Padding.NEXT_ICON
+import com.rhseung.glance.tooltip.TooltipConstants.Padding.SLOT_MARGIN
+import com.rhseung.glance.tooltip.TooltipConstants.Padding.SPACE
+import com.rhseung.glance.tooltip.component.*
 import com.rhseung.glance.util.Color
 import com.rhseung.glance.util.Color.Companion.toColor
+import com.rhseung.glance.util.Color.Companion.with
 import com.rhseung.glance.util.Slot
 import com.rhseung.glance.util.Slot.Companion.toSlot
 import com.rhseung.glance.util.Util
 import com.rhseung.glance.util.Util.toStringPretty
-import com.rhseung.glance.util.icon.SlotIcon.Companion.toIcon
+import com.rhseung.glance.tooltip.icon.AttributeIcon.Companion.toIcon
+import com.rhseung.glance.tooltip.icon.SignIcon
+import com.rhseung.glance.tooltip.icon.SignIcon.Companion.toSignIcon
+import com.rhseung.glance.tooltip.icon.SlotIcon.Companion.toIcon
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.component.DataComponentTypes
@@ -46,7 +45,7 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
         if (slot !in lines)
             lines[slot] = line;
         else
-            lines[slot]!!.add(XPaddingComponent(Padding.NEXT_ICON.size)).add(line);
+            lines[slot]!!.add(XPaddingComponent(NEXT_ICON)).add(line);
     }
 
     /**
@@ -79,16 +78,16 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
         val signIcon: SignIcon? = attribute.value().toSignIcon(value);
         val color: Color = if (!isFixed) attribute.value().getFormatting(value > 0).toColor() else Color.WHITE;
         val content: String = if (!isFixed) abs(value).toStringPretty() else value.toStringPretty();
-        val text = (content + if (isMultiplier) SpecialChar.MULTIPLY else "") with color;
+        val text = (content + if (isMultiplier) TooltipConstants.Char.MULTIPLY else "") with color;
 
         val ret = LineComponent(
             IconComponent(attribute.toIcon()),
-            XPaddingComponent(Padding.SPACE.size)
+            XPaddingComponent(SPACE)
         );
 
         if (!isFixed && signIcon != null) {
             ret.add(IconComponent(signIcon))
-                .add(XPaddingComponent(Padding.BETWEEN_SIGN_VALUE.size));
+                .add(XPaddingComponent(BETWEEN_SIGN_VALUE));
         }
 
         return ret.add(TextComponent(text, shift = 1));
@@ -119,9 +118,9 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
             lines.forEach { (slot, line) ->
                 line.addAll(0, LineComponent(
                     IconComponent(slot.toIcon()),
-                    XPaddingComponent(Padding.SPACE.size),
+                    XPaddingComponent(SPACE),
                     TextComponent(">"),
-                    XPaddingComponent(Padding.SLOT_MARGIN.size),
+                    XPaddingComponent(SLOT_MARGIN),
                 ))
             };
         }

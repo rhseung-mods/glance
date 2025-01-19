@@ -1,31 +1,33 @@
 package com.rhseung.glance.tooltip
 
-import com.mojang.blaze3d.systems.RenderSystem
 import com.rhseung.glance.ModMain
 import com.rhseung.glance.util.Color
 import com.rhseung.glance.util.Color.Companion.gradient
-import net.minecraft.client.gl.ShaderProgramKeys
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.render.RenderLayer
+import net.minecraft.component.DataComponentTypes
+import net.minecraft.item.ItemStack
+import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
+import net.minecraft.util.Rarity
 
 object TooltipDecor {
     data class Theme(
-        val outlineColor1: Color,
-        val outlineColor2: Color,
-        val sepColor: Color,
-        val bgColor1: Color,
-        val bgColor2: Color,
+        val topOfOutline: Color,
+        val bottomOfOutline: Color,
+        val separator: Color,
+        val topOfBackground: Color,
+        val bottomOfBackground: Color,
         val cosmetic: Identifier? = null,
         val title: Color? = null,
     ) {
         constructor(color: Color, cosmetic: Identifier? = null, title: Color? = null):
             this(color, color.darker(0.2f), color.darker(0.1f), color.darker(0.85f), Color.BLACK, cosmetic, title);
+
         constructor(outlineColor1: Color, outlineColor2: Color, cosmetic: Identifier? = null, title: Color? = null):
             this(outlineColor1, outlineColor2, (outlineColor1 to outlineColor2).gradient(0.5f), outlineColor1.darker(0.7f), Color.BLACK, cosmetic, title);
 
-        fun reverseBg(): Theme {
-            return Theme(outlineColor1, outlineColor2, sepColor, bgColor2, bgColor1, cosmetic, title);
+        fun reverseBackgroundColor(): Theme {
+            return Theme(topOfOutline, bottomOfOutline, separator,
+                bottomOfBackground, topOfBackground, cosmetic, title);
         }
     };
 
@@ -40,7 +42,7 @@ object TooltipDecor {
         val MUSIC = Theme(Color.WHITE, id("music"));
         val ENDER = Theme(Color(0xCA87FF), Color(0x6C11B2), id("ender"));
         val ENCHANT = Theme(Color(0x8B4513), Color(0x723510), id("enchant"));
-        val ECHO = Theme(Color(0x00FFD1), Color(0x14BDB2), id("echo")).reverseBg();
+        val ECHO = Theme(Color(0x00FFD1), Color(0x14BDB2), id("echo")).reverseBackgroundColor();
 
         val COPPER = Theme(Color(0x70453D), Color(0x542323), id("copper"), Color(0xf9ae9c));
         val GOLD = Theme(Color(0x996922), Color(0x5B3B1D), id("gold"), Color(0xFFD700));
@@ -49,87 +51,30 @@ object TooltipDecor {
         val NETHERITE = Theme(Color(0x766A76), Color(0x5D565D), id("netherite"));
     }
 
-    fun drawBackground(context: DrawContext, innerX: IntRange, innerY: IntRange, z: Int, theme: Theme) {
-        val xstart = innerX.first - 2;
-        val ystart = innerY.first - 2;
-        val xend = innerX.endExclusive + 2;
-        val yend = innerY.endExclusive + 2;
-        val color1 = theme.bgColor1.toInt(240);
-        val color2 = theme.bgColor2.toInt(240);
+    fun themeFromItem(stack: ItemStack): Theme {
+        val id = Registries.ITEM.getId(stack.item);
 
-        context.matrices.push();
-        RenderSystem.enableDepthTest();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-
-        // center background
-        context.fillGradient(xstart + 1, ystart + 1, xend - 1, yend - 1, z, color1, color2);
-
-        // top background
-        context.fill(xstart + 1, ystart, xend - 1, ystart + 1, z, color1);
-
-        // bottom background
-        context.fill(xstart + 1, yend - 1, xend - 1, yend, z, color1);
-
-        // left background
-        context.fillGradient(xstart, ystart + 1, xstart + 1, yend - 1, z, color1, color2);
-
-        // right background
-        context.fillGradient(xend - 1, ystart + 1, xend, yend - 1, z, color1, color2);
-
-        RenderSystem.disableBlend();
-        context.matrices.pop();
-    }
-
-    fun drawBorder(context: DrawContext, innerX: IntRange, innerY: IntRange, z: Int, theme: Theme) {
-        val xstart = innerX.first - 1;
-        val ystart = innerY.first - 1;
-        val xend = innerX.endExclusive + 1;
-        val yend = innerY.endExclusive + 1;
-        val xcenter = (xstart + xend - 1) / 2;
-        val ycenter = (ystart + yend - 1) / 2;
-
-        val color1 = theme.outlineColor1.toInt();
-        val color2 = theme.outlineColor2.toInt();
-
-        context.matrices.push();
-
-        // top
-        context.fill(xstart, ystart, xend, ystart + 1, z, color1);
-
-        // bottom
-        context.fill(xstart, yend - 1, xend, yend, z, color2);
-
-        // left
-        context.fillGradient(xstart, ystart + 1, xstart + 1, yend - 1, z, color1, color2);
-
-        // right
-        context.fillGradient(xend - 1, ystart + 1, xend, yend - 1, z, color1, color2);
-
-        // draw cosmetics
-        if (theme.cosmetic != null) {
-            context.matrices.translate(0f, 0f, 400f);
-
-            // top-left cosmetic
-            context.drawGuiTexture(RenderLayer::getGuiTextured, theme.cosmetic, 64, 16, 0, 0, xstart - 3, ystart - 3, 8, 8);
-
-            // bottom-left cosmetic
-            context.drawGuiTexture(RenderLayer::getGuiTextured, theme.cosmetic, 64, 16, 0, 8, xstart - 3, (yend - 1) - 4, 8, 8);
-
-            // top-right cosmetic
-            context.drawGuiTexture(RenderLayer::getGuiTextured, theme.cosmetic, 64, 16, 56, 0, (xend - 1) - 4, ystart - 3, 8, 8);
-
-            // bottom-right cosmetic
-            context.drawGuiTexture(RenderLayer::getGuiTextured, theme.cosmetic, 64, 16, 56, 8, (xend - 1) - 4, (yend - 1) - 4, 8, 8);
-
-            // top-center cosmetic
-            context.drawGuiTexture(RenderLayer::getGuiTextured, theme.cosmetic, 64, 16, 8, 0, xcenter - 23, ystart - 6, 48, 8);
-
-            // bottom-center cosmetic
-            context.drawGuiTexture(RenderLayer::getGuiTextured, theme.cosmetic, 64, 16, 8, 8, xcenter - 23, (yend - 1) - 1, 48, 8);
+        return if (stack.contains(DataComponentTypes.STORED_ENCHANTMENTS))
+            Themes.ENCHANT;
+        else if (stack.contains(DataComponentTypes.JUKEBOX_PLAYABLE))
+            Themes.MUSIC;
+        else if ("copper" in id.path)
+            Themes.COPPER;
+        else if ("gold" in id.path)
+            Themes.GOLD;
+        else if ("iron" in id.path)
+            Themes.IRON;
+        else if ("netherite" in id.path)
+            Themes.NETHERITE;
+        else if ("ender" in id.path)
+            Themes.ENDER;
+        else if ("sculk" in id.path || "echo" in id.path)
+            Themes.ECHO;
+        else when (stack.rarity) {
+            Rarity.COMMON -> Themes.DEFAULT;
+            Rarity.UNCOMMON -> Themes.UNCOMMON;
+            Rarity.RARE -> Themes.RARE;
+            Rarity.EPIC -> Themes.EPIC;
         }
-
-        context.matrices.pop();
     }
 }

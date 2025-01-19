@@ -1,14 +1,14 @@
 package com.rhseung.glance.tooltip.content
 
-import com.rhseung.glance.draw.element.GlanceText.Companion.with
-import com.rhseung.glance.util.icon.TooltipIcon
-import com.rhseung.glance.legacy_tooltip.util.SpecialChar
+import com.rhseung.glance.tooltip.TooltipConstants
 import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.IconComponent
 import com.rhseung.glance.tooltip.component.LineComponent
 import com.rhseung.glance.tooltip.component.TextComponent
 import com.rhseung.glance.util.Color
+import com.rhseung.glance.util.Color.Companion.with
 import com.rhseung.glance.util.Util.toStringPretty
+import com.rhseung.glance.tooltip.icon.TooltipIcon
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.ingame.AbstractFurnaceScreen
 import net.minecraft.item.Item
@@ -18,7 +18,7 @@ class FuelContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item,
     private val burnTick = MinecraftClient.getInstance().world!!.fuelRegistry.getFuelTicks(itemStack);
     private val itemSmeltTick = 200;
     private val burnAmount = burnTick.toFloat() / itemSmeltTick;
-    private val burnAmountText = (SpecialChar.MULTIPLY + burnAmount.toStringPretty()) with Color.FUEL;
+    private val burnAmountText = (TooltipConstants.Char.MULTIPLY + burnAmount.toStringPretty()) with Color.FUEL;
 
     override fun getComponents(): List<GlanceTooltipComponent> {
         return listOf(LineComponent(

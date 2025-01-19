@@ -32,15 +32,15 @@ class BoxComponent(
         context.matrices.push();
 
         // bg
-        context.fill(innerX, innerY, innerX + width, innerY + height, 400, theme.bgColor1.toInt(200));
+        context.fill(innerX, innerY, innerX + width, innerY + height, 400, theme.topOfBackground.toInt(200));
         // top
-        context.fill(innerX, innerY - 1, innerX + width, innerY, 400, theme.outlineColor1.toInt(150));
+        context.fill(innerX, innerY - 1, innerX + width, innerY, 400, theme.topOfOutline.toInt(150));
         // bottom
-        context.fill(innerX, innerY + height, innerX + width, innerY + height + 1, 400, theme.outlineColor1.toInt(150));
+        context.fill(innerX, innerY + height, innerX + width, innerY + height + 1, 400, theme.topOfOutline.toInt(150));
         // left
-        context.fill(innerX - 1, innerY, innerX, innerY + height, 400, theme.outlineColor1.toInt(150));
+        context.fill(innerX - 1, innerY, innerX, innerY + height, 400, theme.topOfOutline.toInt(150));
         // right
-        context.fill(innerX + width, innerY, innerX + width + 1, innerY + height, 400, theme.outlineColor1.toInt(150));
+        context.fill(innerX + width, innerY, innerX + width + 1, innerY + height, 400, theme.topOfOutline.toInt(150));
 
         context.matrices.pop();
     }

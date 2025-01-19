@@ -1,8 +1,7 @@
-package com.rhseung.glance.util.icon
+package com.rhseung.glance.tooltip.icon
 
 import com.rhseung.glance.ModMain
-import com.rhseung.glance.draw.DrawHelper
-import com.rhseung.glance.util.Icon
+import com.rhseung.glance.util.Util
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer
@@ -33,7 +32,7 @@ class HudIcon(
     }
 
     fun draw(context: DrawContext, renderer: TextRenderer, x0: Int, y0: Int, color: Int): Int {
-        DrawHelper.drawGuiTextureColor(context, RenderLayer::getGuiTextured, id, width * variants, height, width * index, 0, x0, y0, width, height, color);
+        Util.drawGuiTextureColor(context, RenderLayer::getGuiTextured, id, width * variants, height, width * index, 0, x0, y0, width, height, color);
         return x0 + width;
     }
 

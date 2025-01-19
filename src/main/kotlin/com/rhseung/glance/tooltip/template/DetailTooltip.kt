@@ -13,7 +13,6 @@ import com.rhseung.glance.tooltip.component.StackedComponent
 import com.rhseung.glance.tooltip.component.TextComponent
 import com.rhseung.glance.tooltip.component.XPaddingComponent
 import com.rhseung.glance.tooltip.component.YPaddingComponent
-import com.rhseung.glance.util.Color
 import com.rhseung.glance.util.Util.ifElse
 import com.rhseung.glance.util.Util.joinTo
 import net.minecraft.client.gui.tooltip.TooltipComponent
@@ -26,12 +25,10 @@ class DetailTooltip(
     theme: TooltipDecor.Theme,
     stack: ItemStack,
 ) : GlanceTooltip(titles, components, theme) {
+
     override var tooltip: MutableList<TooltipComponent>;
 
     init {
-        val textColor = titles[0].text.style.color ?: titles[0].text.siblings[0]?.style?.color;
-        val color = Color(textColor?.rgb ?: -1);
-
         tooltip = mutableListOf(
             YPaddingComponent(3),
             CenteredLineComponent(
@@ -49,7 +46,7 @@ class DetailTooltip(
 
         if (components.isNotEmpty()) {
             tooltip.addAll(listOf(
-                SeparatorComponent(theme.outlineColor1),
+                SeparatorComponent(theme.topOfOutline),
                 YPaddingComponent(3),
                 *this.components.joinTo(YPaddingComponent(3)).toTypedArray(),
                 YPaddingComponent(3)

@@ -1,124 +1,285 @@
 package com.rhseung.glance.tooltip
 
-import com.rhseung.glance.legacy_tooltip.util.TooltipConstants
-import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
+import com.mojang.blaze3d.systems.RenderSystem
+import com.rhseung.glance.tooltip.TooltipConstants.Padding.TOOLTIP_FRAME_MARGIN
 import com.rhseung.glance.tooltip.component.TextComponent
+import com.rhseung.glance.tooltip.content.GlanceTooltipContent
 import com.rhseung.glance.tooltip.content.TooltipContentRegistry
 import com.rhseung.glance.tooltip.template.DefaultTooltip
 import com.rhseung.glance.tooltip.template.DetailTooltip
+import com.rhseung.glance.tooltip.template.GlanceTooltip
 import com.rhseung.glance.util.Color
-import com.rhseung.glance.util.Util
-import com.rhseung.glance.util.Util.getProperty
-import com.rhseung.glance.util.Util.ifElse
-import com.rhseung.glance.util.Util.safeGet
+import com.rhseung.glance.util.Util.get
 import com.rhseung.glance.util.Util.toRangeSize
 import com.rhseung.glance.util.Util.toText
-import net.minecraft.block.OxidizableBlock
 import net.minecraft.client.font.TextRenderer
+import net.minecraft.client.gl.ShaderProgramKeys
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.tooltip.OrderedTextTooltipComponent
 import net.minecraft.client.gui.tooltip.TooltipComponent
 import net.minecraft.client.gui.tooltip.TooltipPositioner
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.item.BlockItem
+import net.minecraft.client.render.RenderLayer
 import net.minecraft.item.ItemStack
-import net.minecraft.registry.Registries
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Style
-import net.minecraft.text.Text
-import net.minecraft.util.Rarity
 
 object Tooltip {
+    fun drawBackground(
+        context: DrawContext,
+        innerX: IntRange,
+        innerY: IntRange,
+        z: Int,
+        theme: TooltipDecor.Theme
+    ) {
+        val xstart = innerX.first - 2;
+        val ystart = innerY.first - 2;
+        val xend = innerX.endExclusive + 2;
+        val yend = innerY.endExclusive + 2;
+        val color1 = theme.topOfBackground.toInt(240);
+        val color2 = theme.bottomOfBackground.toInt(240);
+
+        context.matrices.push();
+        RenderSystem.enableDepthTest();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+
+        // center background
+        context.fillGradient(xstart + 1, ystart + 1, xend - 1, yend - 1, z, color1, color2);
+
+        // top background
+        context.fill(xstart + 1, ystart, xend - 1, ystart + 1, z, color1);
+
+        // bottom background
+        context.fill(xstart + 1, yend - 1, xend - 1, yend, z, color1);
+
+        // left background
+        context.fillGradient(xstart, ystart + 1, xstart + 1, yend - 1, z, color1, color2);
+
+        // right background
+        context.fillGradient(xend - 1, ystart + 1, xend, yend - 1, z, color1, color2);
+
+        RenderSystem.disableBlend();
+        context.matrices.pop();
+    }
+
+    fun drawBorder(
+        context: DrawContext,
+        innerX: IntRange,
+        innerY: IntRange,
+        z: Int,
+        theme: TooltipDecor.Theme
+    ) {
+        val xstart = innerX.first - 1;
+        val ystart = innerY.first - 1;
+        val xend = innerX.endExclusive + 1;
+        val yend = innerY.endExclusive + 1;
+        val xcenter = (xstart + xend - 1) / 2;
+        val ycenter = (ystart + yend - 1) / 2;
+
+        val color1 = theme.topOfOutline.toInt();
+        val color2 = theme.bottomOfOutline.toInt();
+
+        context.matrices.push();
+
+        // top
+        context.fill(xstart + 1, ystart, xend - 1, ystart + 1, z, color1);
+
+        // bottom
+        context.fill(xstart + 1, yend - 1, xend - 1, yend, z, color2);
+
+        // left
+        context.fillGradient(xstart, ystart + 1, xstart + 1, yend - 1, z, color1, color2);
+
+        // right
+        context.fillGradient(xend - 1, ystart + 1, xend, yend - 1, z, color1, color2);
+
+        // draw cosmetics
+        if (theme.cosmetic != null) {
+            context.matrices.translate(0f, 0f, 400f);
+
+            // top-left cosmetic
+            context.drawGuiTexture(
+                RenderLayer::getGuiTextured,
+                theme.cosmetic,
+                64,
+                16,
+                0,
+                0,
+                xstart - 3,
+                ystart - 3,
+                8,
+                8
+            );
+
+            // bottom-left cosmetic
+            context.drawGuiTexture(
+                RenderLayer::getGuiTextured,
+                theme.cosmetic,
+                64,
+                16,
+                0,
+                8,
+                xstart - 3,
+                (yend - 1) - 4,
+                8,
+                8
+            );
+
+            // top-right cosmetic
+            context.drawGuiTexture(
+                RenderLayer::getGuiTextured,
+                theme.cosmetic,
+                64,
+                16,
+                56,
+                0,
+                (xend - 1) - 4,
+                ystart - 3,
+                8,
+                8
+            );
+
+            // bottom-right cosmetic
+            context.drawGuiTexture(
+                RenderLayer::getGuiTextured,
+                theme.cosmetic,
+                64,
+                16,
+                56,
+                8,
+                (xend - 1) - 4,
+                (yend - 1) - 4,
+                8,
+                8
+            );
+
+            // top-center cosmetic
+            context.drawGuiTexture(
+                RenderLayer::getGuiTextured,
+                theme.cosmetic,
+                64,
+                16,
+                8,
+                0,
+                xcenter - 23,
+                ystart - 6,
+                48,
+                8
+            );
+
+            // bottom-center cosmetic
+            context.drawGuiTexture(
+                RenderLayer::getGuiTextured,
+                theme.cosmetic,
+                64,
+                16,
+                8,
+                8,
+                xcenter - 23,
+                (yend - 1) - 1,
+                48,
+                8
+            );
+        }
+
+        context.matrices.pop();
+    }
+
     fun draw(
         context: DrawContext,
         textRenderer: TextRenderer,
-        tooltipComponents: List<TooltipComponent>,
         positioner: TooltipPositioner,
         mouseX: Int,
         mouseY: Int,
-        stack: ItemStack? = null,
+        tooltipComponents: List<TooltipComponent>,
+        stack: ItemStack? = null
     ) {
-        val everyComponents = tooltipComponents.map {
-            if (it is OrderedTextTooltipComponent)
-                TextComponent(it.getProperty<OrderedText>("text").toText())
+        val everyComponents: List<TooltipComponent> = tooltipComponents.map { component ->
+            if (component is OrderedTextTooltipComponent) {
+                val text: OrderedText = component["text"];
+                return@map TextComponent(text.toText());
+            }
             else
-                it
-        }.toMutableList();
+                return@map component;
+        };
 
-        val titleStyle = (everyComponents[0] as TextComponent).text.style;
-        var titleEndIdx = everyComponents.indexOfFirst { it !is TextComponent || !it.text.style.equals(titleStyle) };
-        if (titleEndIdx == -1)
-            titleEndIdx = everyComponents.size;
+        val titleStyle: Style? = (everyComponents[0] as? TextComponent)?.let {
+            it.text.style ?: it.text.siblings.getOrNull(0)?.style;
+        };
 
-        if (stack != null)
-            TooltipContentRegistry.find(stack.item, stack).forEach { everyComponents.addAll(titleEndIdx, it.getComponents()) }
+        val titleEndIdx: Int = everyComponents
+            .indexOfFirst { it !is TextComponent || it.text.style != titleStyle }
+            .takeIf { it != -1 } ?: everyComponents.size;
 
-        val titleComponents: List<TextComponent> = everyComponents.subList(0, titleEndIdx) as? List<TextComponent> ?: error("Title components must be TextComponent");
-        var components: List<TooltipComponent> = everyComponents.subList(titleEndIdx, everyComponents.size);
+        val titleComponents: List<TextComponent> = everyComponents
+            .subList(0, titleEndIdx)
+            .map { it as TextComponent };
 
         if (titleComponents.isEmpty())
             return;
 
-        components = components.dropWhile { it is TextComponent && it.text.string.isEmpty() };
+        val components: MutableList<TooltipComponent> = everyComponents
+            .subList(titleEndIdx, everyComponents.size)
+            .dropWhile { it is TextComponent && it.text.string.isEmpty() }
+            .toMutableList();
 
-        val firstTitle = titleComponents[0].text.asOrderedText().toText();
-        val textColor = firstTitle.style.color ?: firstTitle.siblings.safeGet(0)?.style?.color;
-        val color = if (textColor?.rgb != null) Color(textColor.rgb) else null;
+        if (stack != null) {
+            TooltipContentRegistry.find(stack.item, stack)
+                .map(GlanceTooltipContent::getComponents)
+                .forEach(components::addAll);
+        }
+
+        val color: Color? = titleStyle?.color?.rgb?.let(::Color);
 
         val theme: TooltipDecor.Theme =
-        if (stack != null) {
-            val id = Registries.ITEM.getId(stack.item);
-
-            if (stack.contains(DataComponentTypes.STORED_ENCHANTMENTS))
-                TooltipDecor.Themes.ENCHANT;
-            else if (stack.contains(DataComponentTypes.JUKEBOX_PLAYABLE))
-                TooltipDecor.Themes.MUSIC;
-            else if ("copper" in id.path)
-                TooltipDecor.Themes.COPPER;
-            else if ("gold" in id.path)
-                TooltipDecor.Themes.GOLD;
-            else if ("iron" in id.path)
-                TooltipDecor.Themes.IRON;
-            else if ("netherite" in id.path)
-                TooltipDecor.Themes.NETHERITE;
-            else if ("ender" in id.path)
-                TooltipDecor.Themes.ENDER;
-            else if ("sculk" in id.path || "echo" in id.path)
-                TooltipDecor.Themes.ECHO;
-            else when (stack.rarity) {
-                Rarity.COMMON -> TooltipDecor.Themes.DEFAULT;
-                Rarity.UNCOMMON -> TooltipDecor.Themes.UNCOMMON;
-                Rarity.RARE -> TooltipDecor.Themes.RARE;
-                Rarity.EPIC -> TooltipDecor.Themes.EPIC;
-            }
-        } else {
-            if (color != null)
+            if (stack != null)
+                TooltipDecor.themeFromItem(stack);
+            else if (color != null)
                 TooltipDecor.Theme(color);
             else
                 TooltipDecor.Themes.DEFAULT;
-        }
 
-        val tooltip = if (stack != null && Screen.hasShiftDown())
-            DetailTooltip(titleComponents, components, theme, stack);
-        else
-            DefaultTooltip(titleComponents, components, theme);
+        val tooltip: GlanceTooltip =
+            if (stack != null && Screen.hasShiftDown())
+                DetailTooltip(titleComponents, components, theme, stack);
+            else
+                DefaultTooltip(titleComponents, components, theme);
 
+        this.draw(context, textRenderer, positioner, mouseX, mouseY, tooltip);
+    }
+
+    fun draw(
+        context: DrawContext,
+        textRenderer: TextRenderer,
+        positioner: TooltipPositioner,
+        mouseX: Int,
+        mouseY: Int,
+        tooltip: GlanceTooltip
+    ) {
         val width = tooltip.getWidth(textRenderer);
         val height = tooltip.getHeight(textRenderer);
-        val tooltipWidth = width + 2 * TooltipConstants.TOOLTIP_FRAME;
-        val tooltipHeight = height + 2 * TooltipConstants.TOOLTIP_FRAME;
+        val tooltipWidth = width + 2 * TOOLTIP_FRAME_MARGIN;
+        val tooltipHeight = height + 2 * TOOLTIP_FRAME_MARGIN;
 
-        val vector2ic = positioner.getPosition(context.scaledWindowWidth, context.scaledWindowHeight, mouseX, mouseY, tooltipWidth, tooltipHeight);
+        val vector2ic = positioner.getPosition(
+            context.scaledWindowWidth,
+            context.scaledWindowHeight,
+            mouseX,
+            mouseY,
+            tooltipWidth,
+            tooltipHeight
+        );
         val x = vector2ic.x();
         val y = vector2ic.y();
         val z = 400;
 
-        val innerX = (x + TooltipConstants.TOOLTIP_FRAME).toRangeSize(width);
-        val innerY = (y + TooltipConstants.TOOLTIP_FRAME).toRangeSize(height);
+        val innerX = (x + TOOLTIP_FRAME_MARGIN).toRangeSize(width);
+        val innerY = (y + TOOLTIP_FRAME_MARGIN).toRangeSize(height);
 
-        TooltipDecor.drawBackground(context, innerX, innerY, z, theme);
-        TooltipDecor.drawBorder(context, innerX, innerY, z, theme);
+        drawBackground(context, innerX, innerY, z, tooltip.theme);
+        drawBorder(context, innerX, innerY, z, tooltip.theme);
 
         context.matrices.push();
         context.matrices.translate(0f, 0f, z.toFloat());

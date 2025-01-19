@@ -1,5 +1,9 @@
 package com.rhseung.glance.util
 
+import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.texture.GuiAtlasManager
+import net.minecraft.client.texture.Scaling.Stretch
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.EnchantmentEffectComponentTypes
 import net.minecraft.component.type.AttributeModifierSlot
@@ -14,8 +18,10 @@ import net.minecraft.item.ItemStack
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Text
+import net.minecraft.util.Identifier
 import java.lang.reflect.Field
 import java.lang.reflect.Method
+import java.util.function.Function
 import kotlin.math.abs
 import kotlin.math.ceil
 
@@ -115,6 +121,11 @@ object Util {
         return get(this, propertyName);
     }
 
+    @JvmName("getOperator")
+    operator fun <T> Any.get(propertyName: String): T {
+        return getProperty<T>(propertyName);
+    }
+
     @Throws(NoSuchMethodException::class)
     private fun getMethod(clazz: Class<*>, methodName: String, vararg parameterTypes: Class<*>): Method {
         val methods = clazz.declaredMethods.filter { it.name == methodName && it.parameterCount == parameterTypes.size };
@@ -178,10 +189,6 @@ object Util {
         return mutableTextArr[0];
     }
 
-    fun <E> List<E>.safeGet(idx: Int): E? {
-        return if (idx in this.indices) this[idx] else null;
-    }
-
     fun defaultAttribute(
         attributeModifiers: List<AttributeModifiersComponent.Entry>,
         slot: AttributeModifierSlot,
@@ -229,5 +236,29 @@ object Util {
 
     fun getEquipmentSlot(player: PlayerEntity, stack: ItemStack): EquipmentSlot? {
         return EquipmentSlot.VALUES.find { slot -> player.getEquippedStack(slot) == stack };
+    }
+
+    fun drawGuiTextureColor(
+        context: DrawContext,
+        renderLayers: Function<Identifier, RenderLayer>,
+        sprite: Identifier,
+        textureWidth: Int,
+        textureHeight: Int,
+        u: Int,
+        v: Int,
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        color: Int
+    ) {
+        val guiAtlasManager = context.getProperty<GuiAtlasManager>("guiAtlasManager");
+        val sprite2 = guiAtlasManager.getSprite(sprite);
+        val scaling = guiAtlasManager.getScaling(sprite2);
+
+        if (scaling is Stretch)
+            context.invokeMethod<Unit>("drawSpriteRegion", renderLayers, sprite2, textureWidth, textureHeight, u, v, x, y, width, height, color);
+        else
+            context.invokeMethod<Unit>("drawSpriteStretched", renderLayers, sprite2, x, y, width, height, color);
     }
 }

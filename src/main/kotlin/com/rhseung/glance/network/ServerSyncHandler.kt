@@ -1,14 +1,13 @@
 package com.rhseung.glance.network
 
-import com.rhseung.glance.network.payload.SaturationSyncPayload
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
+import com.rhseung.glance.network.payload.SaturationSyncPayloadS2C
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.server.network.ServerPlayerEntity
 import java.util.*
 
 object ServerSyncHandler {
     fun registerS2CPayloads() {
-        PayloadTypeRegistry.playS2C().register(SaturationSyncPayload.ID, SaturationSyncPayload.CODEC);
+        SaturationSyncPayloadS2C.register();
     }
 
     val saturationByPlayer = mutableMapOf<UUID, Float>();
@@ -18,7 +17,7 @@ object ServerSyncHandler {
         val saturation = player.hungerManager.saturationLevel;
 
         if (lastSaturation == null || lastSaturation != saturation) {
-            ServerPlayNetworking.send(player, SaturationSyncPayload(saturation));
+            ServerPlayNetworking.send(player, SaturationSyncPayloadS2C(saturation));
             saturationByPlayer[player.uuid] = saturation;
         }
     }

@@ -1,6 +1,5 @@
 package com.rhseung.glance.tooltip.component
 
-import com.rhseung.glance.draw.DrawHelper
 import com.rhseung.glance.util.Color
 import com.rhseung.glance.util.Util.getProperty
 import com.rhseung.glance.util.Util.splitToTwo

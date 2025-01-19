@@ -2,7 +2,6 @@ package com.rhseung.glance
 
 import com.rhseung.glance.network.ServerSyncHandler
 import com.rhseung.glance.test.GlanceTestItems
-import com.rhseung.glance.legacy_tooltip.*
 import com.rhseung.glance.tooltip.content.AttributeContent
 import com.rhseung.glance.tooltip.content.EnchantmentContent
 import com.rhseung.glance.tooltip.content.FoodContent

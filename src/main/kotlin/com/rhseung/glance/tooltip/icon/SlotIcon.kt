@@ -1,7 +1,6 @@
-package com.rhseung.glance.util.icon
+package com.rhseung.glance.tooltip.icon
 
 import com.rhseung.glance.ModMain
-import com.rhseung.glance.util.Icon
 import com.rhseung.glance.util.Slot
 import net.minecraft.component.type.AttributeModifierSlot
 import net.minecraft.util.Identifier

@@ -1,7 +1,6 @@
-package com.rhseung.glance.util.icon
+package com.rhseung.glance.tooltip.icon
 
 import com.rhseung.glance.ModMain
-import com.rhseung.glance.util.Icon
 import net.minecraft.util.Identifier
 
 class TooltipIcon(val name: String, variants: Int = 1, index: Int = 0) : Icon(variants, 9, 9, index) {

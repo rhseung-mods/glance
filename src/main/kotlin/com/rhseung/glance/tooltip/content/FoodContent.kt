@@ -1,6 +1,6 @@
 package com.rhseung.glance.tooltip.content
 
-import com.rhseung.glance.util.icon.TooltipIcon
+import com.rhseung.glance.tooltip.icon.TooltipIcon
 import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.IconComponent
 import com.rhseung.glance.tooltip.component.LineComponent

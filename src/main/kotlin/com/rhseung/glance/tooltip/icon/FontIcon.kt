@@ -1,11 +1,11 @@
-package com.rhseung.glance.util.icon
+package com.rhseung.glance.tooltip.icon
 
 import com.rhseung.glance.ModMain
-import com.rhseung.glance.util.Icon
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.util.Identifier
+import kotlin.text.iterator
 
 class FontIcon(val file: String, val chars: String, index: Int = -1, width: Int = 5, height: Int = 7)
     : Icon(chars.length, width, height, index) {

@@ -1,6 +1,8 @@
 package com.rhseung.glance.util
 
 import net.minecraft.item.ToolMaterial
+import net.minecraft.text.MutableText
+import net.minecraft.text.Text
 import net.minecraft.text.TextColor
 import net.minecraft.util.Formatting
 import kotlin.math.roundToInt
@@ -139,6 +141,10 @@ class Color {
     companion object {
         fun empty(): Int {
             return Color.WHITE.argb(0);    // -1와 동일
+        }
+
+        infix fun String.with(color: Color): MutableText {
+            return Text.literal(this).withColor(color.toInt());
         }
 
         val WOOD = Color(150, 116, 65);

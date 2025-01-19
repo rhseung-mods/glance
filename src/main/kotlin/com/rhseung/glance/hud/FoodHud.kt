@@ -1,6 +1,6 @@
 package com.rhseung.glance.hud
 
-import com.rhseung.glance.util.icon.HudIcon
+import com.rhseung.glance.tooltip.icon.HudIcon
 import com.rhseung.glance.util.Util.getProperty
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext

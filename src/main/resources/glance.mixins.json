@@ -7,8 +7,7 @@
     "network.ServerPlayerEntityMixin",
     "tooltip.EnchantmentMixin",
     "tooltip.ItemStackMixin",
-    "tooltip.PotionContentsComponentMixin",
-    "tooltip.SettingsMixin"
+    "tooltip.PotionContentsComponentMixin"
   ],
   "injectors": {
     "defaultRequire": 1

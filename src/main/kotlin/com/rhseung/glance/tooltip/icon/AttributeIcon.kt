@@ -1,7 +1,6 @@
-package com.rhseung.glance.util.icon
+package com.rhseung.glance.tooltip.icon
 
 import com.rhseung.glance.ModMain
-import com.rhseung.glance.util.Icon
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.registry.entry.RegistryEntry

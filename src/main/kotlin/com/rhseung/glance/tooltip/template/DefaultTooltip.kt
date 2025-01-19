@@ -2,17 +2,12 @@ package com.rhseung.glance.tooltip.template
 
 import com.rhseung.glance.tooltip.TooltipDecor
 import com.rhseung.glance.tooltip.component.CenteredLineComponent
-import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.LineComponent
 import com.rhseung.glance.tooltip.component.SeparatorComponent
 import com.rhseung.glance.tooltip.component.TextComponent
 import com.rhseung.glance.tooltip.component.XPaddingComponent
 import com.rhseung.glance.tooltip.component.YPaddingComponent
-import com.rhseung.glance.util.Color
 import com.rhseung.glance.util.Util.joinTo
-import com.rhseung.glance.util.Util.safeGet
-import net.minecraft.client.font.TextRenderer
-import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.tooltip.TooltipComponent
 
 class DefaultTooltip(
@@ -31,11 +26,8 @@ class DefaultTooltip(
         );
 
         if (components.isNotEmpty()) {
-            val textColor = titles[0].text.style.color ?: titles[0].text.siblings.safeGet(0)?.style?.color;
-            val color = Color(textColor?.rgb ?: -1);
-
             tooltip.addAll(listOf(
-                SeparatorComponent(theme.outlineColor1),
+                SeparatorComponent(theme.topOfOutline),
                 YPaddingComponent(2),
                 *this.components.joinTo(YPaddingComponent(2)).toTypedArray(),
                 YPaddingComponent(2)

@@ -40,7 +40,7 @@ public class ItemStackMixin {
         return Screen.hasShiftDown();
     }
 
-    // 내구도를 따로 tooltip component로 따로 출력시키자.
+    // todo: 내구도를 따로 tooltip component로 따로 출력시키자.
     @Redirect(
         method = "getTooltip(Lnet/minecraft/item/Item$TooltipContext;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/tooltip/TooltipType;)Ljava/util/List;",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isDamaged()Z")
