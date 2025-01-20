@@ -196,7 +196,7 @@ object Tooltip {
         tooltipComponents: List<TooltipComponent>,
         stack: ItemStack? = null
     ) {
-        val everyComponents: List<TooltipComponent> = tooltipComponents.map { component ->
+        val originalComponents: List<TooltipComponent> = tooltipComponents.map { component ->
             if (component is OrderedTextTooltipComponent) {
                 val text: OrderedText = component["text"];
                 return@map TextComponent(text.toText());
@@ -205,30 +205,30 @@ object Tooltip {
                 return@map component;
         };
 
-        val titleStyle: Style? = (everyComponents[0] as? TextComponent)?.let {
+        val titleStyle: Style? = (originalComponents[0] as? TextComponent)?.let {
             it.text.style ?: it.text.siblings.getOrNull(0)?.style;
         };
 
-        val titleEndIdx: Int = everyComponents
+        val titleEndIdx: Int = originalComponents
             .indexOfFirst { it !is TextComponent || it.text.style != titleStyle }
-            .takeIf { it != -1 } ?: everyComponents.size;
+            .takeIf { it != -1 } ?: originalComponents.size;
 
-        val titleComponents: List<TextComponent> = everyComponents
+        val titleComponents: List<TextComponent> = originalComponents
             .subList(0, titleEndIdx)
             .map { it as TextComponent };
 
         if (titleComponents.isEmpty())
             return;
 
-        val components: MutableList<TooltipComponent> = everyComponents
-            .subList(titleEndIdx, everyComponents.size)
+        val components: MutableList<TooltipComponent> = originalComponents
+            .subList(titleEndIdx, originalComponents.size)
             .dropWhile { it is TextComponent && it.text.string.isEmpty() }
             .toMutableList();
 
         if (stack != null) {
             TooltipContentRegistry.find(stack.item, stack)
-                .map(GlanceTooltipContent::getComponents)
-                .forEach(components::addAll);
+                .flatMap(GlanceTooltipContent::getComponents)
+                .forEach(components::addFirst);
         }
 
         val color: Color? = titleStyle?.color?.rgb?.let(::Color);

@@ -46,6 +46,6 @@ public class ItemStackMixin {
         at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isDamaged()Z")
     )
     public boolean isDamagedRedirect(ItemStack stack) {
-        return false;
+        return Screen.hasShiftDown();
     }
 }

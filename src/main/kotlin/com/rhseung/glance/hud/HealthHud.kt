@@ -68,7 +68,7 @@ object HealthHud {
         val currentHeartCount = ceil(fromHealth / 2.0).toInt();
         val futureHeartCount = ceil(toHealth / 2.0).toInt();
 
-        val colors = listOf(0xFF1313, 0xFF6600, 0xFFC747, 0x00FF00, 0x2C9EF0, 0xB15AFF).map(::Color);
+        val colors = listOf(0xFF1313, 0xff8b20, 0xFFC747, 0x00FF00, 0x2C9EF0, 0xB15AFF).map(::Color);
         val blinkingColors = listOf(0xFF898B, 0xFFAF7D, 0xFFDB8C, 0x9EFF97, 0x99C3F0, 0xCD9BFF).map(::Color);
 
         val maxHeartCount = maxOf(currentHeartCount, futureHeartCount).coerceAtLeast(10);

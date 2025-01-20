@@ -11,7 +11,7 @@ import net.minecraft.client.render.VertexConsumerProvider
 
 class SeparatorComponent(val color: Color) : GlanceTooltipComponent {
     override fun getWidth(textRenderer: TextRenderer): Int {
-        return -1;  // TODO: -1이면 자동 width 맞춤으로 할까
+        return 0;
     }
 
     override fun getHeight(textRenderer: TextRenderer): Int {

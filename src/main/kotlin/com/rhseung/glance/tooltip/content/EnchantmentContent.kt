@@ -28,6 +28,8 @@ class EnchantmentContent(item: Item, itemStack: ItemStack) : GlanceTooltipConten
     override fun getComponents(): List<GlanceTooltipComponent> {
         val ret = mutableListOf<GlanceTooltipComponent>();
 
+        // todo: 인챈트 아이콘이랑 텍스트 순서 버그 있는 거 같음
+
         enchantmentEntries.forEach { (entry, level) ->
             val enchantment = entry.value();
             ret.add(TextComponent(Enchantment.getName(entry, level)));
