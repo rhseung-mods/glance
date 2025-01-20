@@ -9,6 +9,7 @@ import com.rhseung.glance.tooltip.template.DefaultTooltip
 import com.rhseung.glance.tooltip.template.DetailTooltip
 import com.rhseung.glance.tooltip.template.GlanceTooltip
 import com.rhseung.glance.util.Color
+import com.rhseung.glance.util.Util
 import com.rhseung.glance.util.Util.get
 import com.rhseung.glance.util.Util.toRangeSize
 import com.rhseung.glance.util.Util.toText
@@ -52,7 +53,7 @@ object Tooltip {
         context.fill(xstart + 1, ystart, xend - 1, ystart + 1, z, color1);
 
         // bottom background
-        context.fill(xstart + 1, yend - 1, xend - 1, yend, z, color1);
+        context.fill(xstart + 1, yend - 1, xend - 1, yend, z, color2);
 
         // left background
         context.fillGradient(xstart, ystart + 1, xstart + 1, yend - 1, z, color1, color2);
@@ -205,12 +206,10 @@ object Tooltip {
                 return@map component;
         };
 
-        val titleStyle: Style? = (originalComponents[0] as? TextComponent)?.let {
-            it.text.style ?: it.text.siblings.getOrNull(0)?.style;
-        };
+        val titleStyle: Style? = Util.getStyle((originalComponents[0] as? TextComponent)?.text);
 
         val titleEndIdx: Int = originalComponents
-            .indexOfFirst { it !is TextComponent || it.text.style != titleStyle }
+            .indexOfFirst { it !is TextComponent || Util.getStyle(it.text) != titleStyle }
             .takeIf { it != -1 } ?: originalComponents.size;
 
         val titleComponents: List<TextComponent> = originalComponents
@@ -227,8 +226,8 @@ object Tooltip {
 
         if (stack != null) {
             TooltipContentRegistry.find(stack.item, stack)
-                .flatMap(GlanceTooltipContent::getComponents)
-                .forEach(components::addFirst);
+                .map(GlanceTooltipContent::getComponents)
+                .forEach { components.addAll(0, it) }
         }
 
         val color: Color? = titleStyle?.color?.rgb?.let(::Color);
@@ -236,7 +235,7 @@ object Tooltip {
         val theme: TooltipDecor.Theme =
             if (stack != null)
                 TooltipDecor.themeFromItem(stack);
-            else if (color != null)
+            else if (color != null && color != Color.WHITE)
                 TooltipDecor.Theme(color);
             else
                 TooltipDecor.Themes.DEFAULT;

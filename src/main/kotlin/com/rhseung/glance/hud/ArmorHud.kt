@@ -4,7 +4,6 @@ import com.rhseung.glance.tooltip.icon.HudIcon
 import com.rhseung.glance.tooltip.icon.HudIcon.Companion.ARMOR_LEATHER
 import com.rhseung.glance.tooltip.icon.HudIcon.Companion.equipmentModelToIcon
 import com.rhseung.glance.util.Util.forEachRight
-import com.rhseung.glance.util.Util.getEquipmentSlot
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer
@@ -23,6 +22,10 @@ object ArmorHud {
     private val ARMOR_EMPTY_TEXTURE: Identifier = Identifier.ofVanilla("hud/armor_empty");
 
     data class ArmorData(val slot: EquipmentSlot, val stack: ItemStack, var armorPoint: Int, val hudIcon: HudIcon);
+
+    private fun getEquipmentSlot(player: PlayerEntity, stack: ItemStack): EquipmentSlot? {
+        return EquipmentSlot.VALUES.find { slot -> player.getEquippedStack(slot) == stack };
+    }
 
     private fun getArmorData(player: PlayerEntity): List<ArmorData> {
         val armors = mutableListOf<ArmorData>();

@@ -6,24 +6,24 @@ import com.rhseung.glance.tooltip.TooltipConstants.Padding.NEXT_ICON
 import com.rhseung.glance.tooltip.TooltipConstants.Padding.SLOT_MARGIN
 import com.rhseung.glance.tooltip.TooltipConstants.Padding.SPACE
 import com.rhseung.glance.tooltip.component.*
-import com.rhseung.glance.tooltip.icon.AttributeIcon
 import com.rhseung.glance.util.Color
 import com.rhseung.glance.util.Color.Companion.toColor
 import com.rhseung.glance.util.Color.Companion.with
 import com.rhseung.glance.util.Slot
 import com.rhseung.glance.util.Slot.Companion.toSlot
-import com.rhseung.glance.util.Util
 import com.rhseung.glance.util.Util.toStringPretty
 import com.rhseung.glance.tooltip.icon.AttributeIcon.Companion.toIcon
 import com.rhseung.glance.tooltip.icon.SignIcon
 import com.rhseung.glance.tooltip.icon.SignIcon.Companion.toSignIcon
 import com.rhseung.glance.tooltip.icon.SlotIcon.Companion.toIcon
-import com.rhseung.glance.tooltip.icon.TooltipIcon
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.EnchantmentEffectComponentTypes
 import net.minecraft.component.type.AttributeModifierSlot
 import net.minecraft.component.type.AttributeModifiersComponent
+import net.minecraft.component.type.ItemEnchantmentsComponent
+import net.minecraft.component.type.PotionContentsComponent
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation
@@ -32,7 +32,6 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.entry.RegistryEntry
 import java.util.SortedMap
-import java.util.TreeMap
 import kotlin.math.abs
 
 class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item, itemStack) {
@@ -41,7 +40,7 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
         AttributeModifiersComponent.DEFAULT
     ).modifiers;
     private val player = MinecraftClient.getInstance().player;
-    private val lines: TreeMap<Slot, LineComponent> = TreeMap(compareBy(Slot::ordinal));
+    private val lines: SortedMap<Slot, LineComponent> = sortedMapOf(compareBy(Slot::ordinal));
 
     private fun add(slot: Slot, line: LineComponent?) {
         if (line == null) return;
@@ -49,13 +48,62 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
         if (slot !in lines)
             lines.putIfAbsent(slot, line);
         else
-            lines.get(slot)!!.add(XPaddingComponent(NEXT_ICON)).add(line);
+            lines[slot]!!.add(XPaddingComponent(NEXT_ICON)).add(line);
+    }
+
+    fun defaultAttribute(
+        attributeModifiers: List<AttributeModifiersComponent.Entry>,
+        slot: AttributeModifierSlot,
+        attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
+    ) {
+        attributeModifiers.forEach { entry ->
+            if (!entry.slot.equals(slot))
+                return@forEach;
+
+            attributeModifierConsumer(entry.attribute, entry.modifier);
+        }
     }
 
     /**
-     * [net.minecraft.item.ItemStack.appendAttributeModifierTooltip]
+     * @see net.minecraft.enchantment.EnchantmentHelper.applyAttributeModifiers
      */
-    private fun eachAttributeTooltip(
+    fun enchantmentAttribute(
+        stack: ItemStack,
+        slot: AttributeModifierSlot,
+        attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
+    ) {
+        /**
+         * [net.minecraft.enchantment.EnchantmentHelper.forEachEnchantment]
+         */
+        val itemEnchantmentsComponent = stack.getOrDefault(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT);
+
+        itemEnchantmentsComponent.enchantmentEntries.forEach { (enchantment, level) ->
+            enchantment.value().getEffect(EnchantmentEffectComponentTypes.ATTRIBUTES).forEach { effect ->
+                if (enchantment.value().definition().slots().contains(slot)) {
+                    attributeModifierConsumer(effect.attribute(), effect.createAttributeModifier(level, slot));
+                }
+            }
+        }
+    }
+
+    /**
+     * @see net.minecraft.component.type.PotionContentsComponent.buildTooltip
+     */
+    fun potionAttribute(
+        stack: ItemStack,
+        attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
+    ) {
+        val potionContentsComponent = stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
+
+        potionContentsComponent.effects.forEach { effectInstance ->
+            effectInstance.effectType.value().forEachAttributeModifier(effectInstance.amplifier, attributeModifierConsumer)
+        }
+    }
+
+    /**
+     * @see net.minecraft.item.ItemStack.appendAttributeModifierTooltip
+     */
+    private fun attributeTooltip(
         attribute: RegistryEntry<EntityAttribute>,
         modifier: EntityAttributeModifier,
         blTrueAttributes: List<RegistryEntry<EntityAttribute>>
@@ -97,9 +145,9 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
         return ret.add(TextComponent(text, shift = 1));
     }
 
-    init {
+    override fun getComponents(): List<LineComponent> {
         for (slot in AttributeModifierSlot.entries) {
-            Util.defaultAttribute(attributeModifiers, slot) { attribute, modifier ->
+            defaultAttribute(attributeModifiers, slot) { attribute, modifier ->
                 val blTrueAttributes = listOf(
                     EntityAttributes.ATTACK_DAMAGE,
                     EntityAttributes.ATTACK_SPEED,
@@ -108,16 +156,16 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
                     EntityAttributes.KNOCKBACK_RESISTANCE
                 );
 
-                this.add(slot.toSlot(), eachAttributeTooltip(attribute, modifier, blTrueAttributes));
+                this.add(slot.toSlot(), attributeTooltip(attribute, modifier, blTrueAttributes));
             }
 
-            Util.enchantmentAttribute(itemStack, slot) { attribute, modifier ->
-                this.add(slot.toSlot(), eachAttributeTooltip(attribute, modifier, listOf()));
+            enchantmentAttribute(itemStack, slot) { attribute, modifier ->
+                this.add(slot.toSlot(), attributeTooltip(attribute, modifier, listOf()));
             }
         }
 
-        Util.potionAttribute(itemStack) { attribute, modifier ->
-            this.add(Slot.DRANK, eachAttributeTooltip(attribute, modifier, listOf()));
+        potionAttribute(itemStack) { attribute, modifier ->
+            this.add(Slot.DRANK, attributeTooltip(attribute, modifier, listOf()));
         }
 
         if (lines.size > 1) {
@@ -131,25 +179,6 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
             };
         }
 
-        if (MinecraftClient.getInstance().options.advancedItemTooltips && itemStack.isDamageable) {
-            val durability = itemStack.maxDamage - itemStack.damage;
-            val durabilityText = (durability.toString() with Color.WHITE)
-                .append("/" with Color.DARK_GRAY)
-                .append(itemStack.maxDamage.toString() with Color.DARK_GRAY);
-            val durabilityComponent = LineComponent(
-                IconComponent(TooltipIcon.DURABILITY),
-                XPaddingComponent(SPACE),
-                TextComponent(durabilityText, shift = 1)
-            );
-
-            if (lines.isNotEmpty())
-                this.add(lines.firstKey(), durabilityComponent);
-            else
-                this.add(Slot.MAINHAND, durabilityComponent);
-        }
-    }
-
-    override fun getComponents(): List<GlanceTooltipComponent> {
         return lines.sequencedValues().toList();
     }
 

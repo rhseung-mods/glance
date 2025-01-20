@@ -20,7 +20,7 @@ class FuelContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item,
     private val burnAmount = burnTick.toFloat() / itemSmeltTick;
     private val burnAmountText = (TooltipConstants.Char.MULTIPLY + burnAmount.toStringPretty()) with Color.FUEL;
 
-    override fun getComponents(): List<GlanceTooltipComponent> {
+    override fun getComponents(): List<LineComponent> {
         return listOf(LineComponent(
             IconComponent(TooltipIcon.FUEL), TextComponent(burnAmountText, shift = 1)
         ));

@@ -25,23 +25,21 @@ class EnchantmentContent(item: Item, itemStack: ItemStack) : GlanceTooltipConten
         "the_bumblezone:crystal_cannon", "the_bumblezone:honey_crystal_shield", "the_bumblezone:honey_bee_leggings_2"
     ).map(Identifier::of).map(Registries.ITEM::get).filter { it != Items.AIR }.map(::ItemStack);
 
-    override fun getComponents(): List<GlanceTooltipComponent> {
-        val ret = mutableListOf<GlanceTooltipComponent>();
+    override fun getComponents(): List<LineComponent> {
+        val ret = mutableListOf<LineComponent>();
 
-        // todo: 인챈트 아이콘이랑 텍스트 순서 버그 있는 거 같음
+        enchantmentEntries.forEach { (enchantmentEntry, level) ->
+            val textComponent = TextComponent(Enchantment.getName(enchantmentEntry, level));
+            val testItemComponent = LineComponent(XPaddingComponent(9));
 
-        enchantmentEntries.forEach { (entry, level) ->
-            val enchantment = entry.value();
-            ret.add(TextComponent(Enchantment.getName(entry, level)));
-
-            val line = LineComponent(XPaddingComponent(9));
-            testItems.forEach { testItem ->
-                if (enchantment.isAcceptableItem(testItem)) {
-                    val stackComponent = ItemStackComponent(testItem, 9);
-                    line.add(XPaddingComponent((3 * stackComponent.ratio).toInt())).add(stackComponent);
-                }
+            testItems.filter(enchantmentEntry.value()::isAcceptableItem).forEach {
+                val stackComponent = ItemStackComponent(it, 9);
+                testItemComponent.add(XPaddingComponent((3 * stackComponent.ratio).toInt()));
+                testItemComponent.add(stackComponent);
             }
-            ret.add(line);
+
+            ret.add(LineComponent(textComponent));
+            ret.add(LineComponent(testItemComponent));
         }
 
         return ret;

@@ -17,6 +17,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.OrderedText
+import net.minecraft.text.Style
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import java.lang.reflect.Field
@@ -49,6 +50,14 @@ object Util {
     }
 
     fun <T> Boolean.ifElse(ifTrue: T, ifFalse: T): T = if (this) ifTrue else ifFalse;
+
+    fun getStyle(text: Text?): Style? {
+        if (text == null)
+            return null;
+
+        return text.style.takeIf { !it.isEmpty }
+            ?: text.siblings.getOrNull(0)?.style.takeIf { it != null && !it.isEmpty };
+    }
 
     fun Boolean.toInt() = if (this) 1 else 0;
 
@@ -187,55 +196,6 @@ object Util {
             true;
         }
         return mutableTextArr[0];
-    }
-
-    fun defaultAttribute(
-        attributeModifiers: List<AttributeModifiersComponent.Entry>,
-        slot: AttributeModifierSlot,
-        attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
-    ) {
-        attributeModifiers.forEach { entry ->
-            if (!entry.slot.equals(slot))
-                return@forEach;
-
-            attributeModifierConsumer(entry.attribute, entry.modifier);
-        }
-    }
-
-    /**
-     * [net.minecraft.enchantment.EnchantmentHelper.applyAttributeModifiers]
-     */
-    fun enchantmentAttribute(
-        stack: ItemStack,
-        slot: AttributeModifierSlot,
-        attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
-    ) {
-        /**
-         * [net.minecraft.enchantment.EnchantmentHelper.forEachEnchantment]
-         */
-        val itemEnchantmentsComponent = stack.getOrDefault(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT);
-        itemEnchantmentsComponent.enchantmentEntries.forEach { (enchantment, level) ->
-            enchantment.value().getEffect(EnchantmentEffectComponentTypes.ATTRIBUTES).forEach { effect ->
-                if (enchantment.value().definition().slots().contains(slot)) {
-                    attributeModifierConsumer(effect.attribute(), effect.createAttributeModifier(level, slot));
-                }
-            }
-        }
-    }
-
-    /**
-     * [net.minecraft.component.type.PotionContentsComponent.buildTooltip]
-     */
-    fun potionAttribute(
-        stack: ItemStack,
-        attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
-    ) {
-        val potionContentsComponent = stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
-        potionContentsComponent.effects.forEach { it.effectType.value().forEachAttributeModifier(it.amplifier, attributeModifierConsumer) }
-    }
-
-    fun getEquipmentSlot(player: PlayerEntity, stack: ItemStack): EquipmentSlot? {
-        return EquipmentSlot.VALUES.find { slot -> player.getEquippedStack(slot) == stack };
     }
 
     fun drawGuiTextureColor(

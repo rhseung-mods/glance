@@ -40,12 +40,11 @@ public class ItemStackMixin {
         return Screen.hasShiftDown();
     }
 
-    // todo: 내구도를 따로 tooltip component로 따로 출력시키자.
-    @Redirect(
-        method = "getTooltip(Lnet/minecraft/item/Item$TooltipContext;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/tooltip/TooltipType;)Ljava/util/List;",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isDamaged()Z")
-    )
-    public boolean isDamagedRedirect(ItemStack stack) {
-        return Screen.hasShiftDown();
-    }
+//    @Redirect(
+//        method = "getTooltip(Lnet/minecraft/item/Item$TooltipContext;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/tooltip/TooltipType;)Ljava/util/List;",
+//        at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isDamaged()Z")
+//    )
+//    public boolean isDamagedRedirect(ItemStack stack) {
+//        return Screen.hasShiftDown();
+//    }
 }

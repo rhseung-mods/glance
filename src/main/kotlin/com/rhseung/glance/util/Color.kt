@@ -138,6 +138,17 @@ class Color {
         return Color(H, S, V + delta);
     }
 
+    override fun equals(other: Any?): Boolean {
+        return other is Color && R == other.R && G == other.G && B == other.B;
+    }
+
+    override fun hashCode(): Int {
+        var result = R;
+        result = 31 * result + G;
+        result = 31 * result + B;
+        return result;
+    }
+
     companion object {
         fun empty(): Int {
             return Color.WHITE.argb(0);    // -1와 동일

@@ -6,7 +6,7 @@ import net.minecraft.util.Identifier
 class TooltipIcon(val name: String, variants: Int = 1, index: Int = 0) : Icon(variants, 9, 9, index) {
     override val id: Identifier = ModMain.id("textures/icon/$name.png");
 
-    override fun get(index: Int): Icon {
+    override fun get(index: Int): TooltipIcon {
         if (index < 0 || index >= variants)
             throw Error("index=$index is not valid");
 
