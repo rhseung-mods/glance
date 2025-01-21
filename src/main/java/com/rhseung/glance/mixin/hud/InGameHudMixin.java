@@ -1,4 +1,4 @@
-package com.rhseung.glance.mixin.bar;
+package com.rhseung.glance.mixin.hud;
 
 import com.rhseung.glance.hud.ArmorHud;
 import com.rhseung.glance.hud.FoodHud;

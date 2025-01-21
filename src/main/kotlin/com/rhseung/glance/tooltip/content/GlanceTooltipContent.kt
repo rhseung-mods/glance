@@ -1,6 +1,5 @@
 package com.rhseung.glance.tooltip.content
 
-import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.LineComponent
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack

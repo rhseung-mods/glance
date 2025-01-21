@@ -15,7 +15,7 @@
     "client": [
         "MinecraftClientMixin",
         "ScreenMixin",
-        "bar.InGameHudMixin",
+      "hud.InGameHudMixin",
         "tooltip.BundleTooltipComponentMixin",
         "tooltip.DrawContextMixin",
         "tooltip.HandledScreenMixin",

@@ -1,6 +1,7 @@
 package com.rhseung.glance
 
 import com.rhseung.glance.network.ServerSyncHandler
+import com.rhseung.glance.overlay.StackOverlayRegistry
 import com.rhseung.glance.test.GlanceTestItems
 import com.rhseung.glance.tooltip.content.DurabilityContent
 import com.rhseung.glance.tooltip.content.AttributeContent
@@ -8,6 +9,7 @@ import com.rhseung.glance.tooltip.content.EnchantmentContent
 import com.rhseung.glance.tooltip.content.FoodContent
 import com.rhseung.glance.tooltip.content.FuelContent
 import com.rhseung.glance.tooltip.content.MapContent
+import com.rhseung.glance.tooltip.content.TooltipContentRegistry
 import net.fabricmc.api.ModInitializer
 import net.minecraft.util.Identifier
 import org.slf4j.LoggerFactory
@@ -20,12 +22,10 @@ object ModMain : ModInitializer {
 
 	override fun onInitialize() {
 		// tooltip content
-		DurabilityContent.register();
-		AttributeContent.register();
-		EnchantmentContent.register();
-		FoodContent.register();
-		FuelContent.register();
-		MapContent.register();
+		TooltipContentRegistry.register();
+
+		// stack overlay
+		StackOverlayRegistry.register();
 
 		// network
 		ServerSyncHandler.registerS2CPayloads();
