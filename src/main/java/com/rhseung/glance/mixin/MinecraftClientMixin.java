@@ -1,6 +1,7 @@
 package com.rhseung.glance.mixin;
 
 import com.rhseung.glance.event.RenderTickEvents;
+import com.rhseung.glance.hud.CrosshairHud;
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,5 +20,6 @@ public class MinecraftClientMixin {
     )
     public void renderMixin(boolean tick, CallbackInfo ci) {
         RenderTickEvents.Companion.getEVENT().invoker().tick();
+        CrosshairHud.INSTANCE.onTick();
     }
 }

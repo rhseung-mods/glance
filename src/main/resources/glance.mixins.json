@@ -13,9 +13,10 @@
         "defaultRequire": 1
     },
     "client": [
+        "ProjectileEntityMixin",
         "MinecraftClientMixin",
         "ScreenMixin",
-      "hud.InGameHudMixin",
+        "hud.InGameHudMixin",
         "tooltip.BundleTooltipComponentMixin",
         "tooltip.DrawContextMixin",
         "tooltip.HandledScreenMixin",
