@@ -21,8 +21,11 @@ object CrosshairHud {
     val DEFAULT_TEXTURE = id("hud/crosshair/default");
     val TARGET_TEXTURE = id("hud/crosshair/target");
     val HIT_TEXTURE = id("hud/crosshair/hit");
-    val AIM_TEXTURES = (0..4).map { id("hud/crosshair/aim_$it") };
-    val AIM_TEXTURE = id("hud/crosshair/aim");
+//    val AIM_TEXTURE = id("hud/crosshair/aim");
+    val AIM_TOP_TEXTURE = id("hud/crosshair/aim_top");
+    val AIM_BOTTOM_TEXTURE = id("hud/crosshair/aim_bottom");
+    val AIM_LEFT_TEXTURE = id("hud/crosshair/aim_left");
+    val AIM_RIGHT_TEXTURE = id("hud/crosshair/aim_right");
 
     const val WIDTH = 15;
     const val HEIGHT = 15;
@@ -61,42 +64,32 @@ object CrosshairHud {
         if (player == null)
             return;
 
-        val stack: ItemStack = player.activeItem.takeIf { !it.isEmpty } ?: player.getStackInHand(Hand.MAIN_HAND);
+        val activeStack: ItemStack = player.activeItem.takeIf { !it.isEmpty } ?: player.getStackInHand(Hand.MAIN_HAND);
+        val color = isCritical.ifElse(Color.RED, Color.WHITE).toInt(100);
 
         context.matrices.push();
 
-        if (isAimingItem(stack)) {
-            val maxUseTime: Int = when (stack.item) {
+        this.draw(context, DEFAULT_TEXTURE, x, y);
+        if (client.targetedEntity != null)
+            this.draw(context, TARGET_TEXTURE, x, y, Color.WHITE.toInt(100));
+        if (hitMarkerTicks > 0)
+            this.draw(context, HIT_TEXTURE, x, y, color);
+
+        if (isAimingItem(activeStack)) {
+            val maxUseTime: Int = when (activeStack.item) {
                 is BowItem -> 20;   // todo: mod support
                 is TridentItem -> TridentItem.MIN_DRAW_DURATION;
-                is CrossbowItem -> if (CrossbowItem.isCharged(stack)) -1 else stack.getMaxUseTime(player);
-                else -> stack.getMaxUseTime(player);
+                is CrossbowItem -> if (CrossbowItem.isCharged(activeStack)) -1 else activeStack.getMaxUseTime(player);
+                else -> activeStack.getMaxUseTime(player);
             }
             val useTime: Int = player.itemUseTime;
-            val useTimeLeft = maxOf(0, maxUseTime - useTime);
+            val ratio: Float = (if (activeStack.item is BowItem) BowItem.getPullProgress(useTime) else useTime.toFloat() / maxUseTime).coerceIn(0f, 1f);
+            val diff = (ratio * 5).roundToInt();
 
-            val offset = 0.7f;
-            val ratio: Float = useTimeLeft.toFloat() / maxUseTime * (1f - offset); // 0.3f -> 0f
-            val sizeRatio: Float = offset + ratio;   // 1f -> 0.7f
-
-            context.matrices.push();
-            context.matrices.scale(sizeRatio, sizeRatio, 1f);
-            RenderSystem.enableBlend();
-            val x2: Float = x + WIDTH * (1f - sizeRatio) / 2;
-            val y2: Float = y + HEIGHT * (1f - sizeRatio) / 2;
-            this.draw(context, AIM_TEXTURE, (x2 / sizeRatio).roundToInt(), (y2 / sizeRatio).roundToInt());
-            RenderSystem.disableBlend();
-            context.matrices.scale(1 / sizeRatio, 1 / sizeRatio, 1f);
-            context.matrices.pop();
-
-            if (hitMarkerTicks > 0)
-                this.draw(context, HIT_TEXTURE, x, y, isCritical.ifElse(Color.RED, Color.GRAY).toInt(100));
-        } else {
-            this.draw(context, DEFAULT_TEXTURE, x, y);
-            if (client.targetedEntity != null)
-                this.draw(context, TARGET_TEXTURE, x, y, Color.GRAY.toInt(100));
-            else if (hitMarkerTicks > 0)
-                this.draw(context, HIT_TEXTURE, x, y, isCritical.ifElse(Color.RED, Color.GRAY).toInt(100));
+            this.draw(context, AIM_TOP_TEXTURE, x, y - diff, Color.WHITE.toInt(100));
+            this.draw(context, AIM_BOTTOM_TEXTURE, x, y + diff, Color.WHITE.toInt(100));
+            this.draw(context, AIM_LEFT_TEXTURE, x - diff, y, Color.WHITE.toInt(100));
+            this.draw(context, AIM_RIGHT_TEXTURE, x + diff, y, Color.WHITE.toInt(100));
         }
 
         context.matrices.pop();
