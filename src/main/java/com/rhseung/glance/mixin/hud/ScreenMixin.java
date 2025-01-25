@@ -1,4 +1,4 @@
-package com.rhseung.glance.mixin;
+package com.rhseung.glance.mixin.hud;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;

@@ -2,24 +2,15 @@ package com.rhseung.glance.util
 
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.texture.GuiAtlasManager
 import net.minecraft.client.texture.Scaling.Stretch
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.EnchantmentEffectComponentTypes
-import net.minecraft.component.type.AttributeModifierSlot
-import net.minecraft.component.type.AttributeModifiersComponent
-import net.minecraft.component.type.ItemEnchantmentsComponent
-import net.minecraft.component.type.PotionContentsComponent
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.client.texture.Sprite
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Style
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import org.joml.Matrix4f
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.function.Function
@@ -198,8 +189,7 @@ object Util {
         return mutableTextArr[0];
     }
 
-    fun drawGuiTextureColor(
-        context: DrawContext,
+    fun DrawContext.drawGuiTextureColor(
         renderLayers: Function<Identifier, RenderLayer>,
         sprite: Identifier,
         textureWidth: Int,
@@ -212,13 +202,87 @@ object Util {
         height: Int,
         color: Int
     ) {
-        val guiAtlasManager = context.getProperty<GuiAtlasManager>("guiAtlasManager");
+        val guiAtlasManager = this.getProperty<GuiAtlasManager>("guiAtlasManager");
         val sprite2 = guiAtlasManager.getSprite(sprite);
         val scaling = guiAtlasManager.getScaling(sprite2);
 
         if (scaling is Stretch)
-            context.invokeMethod<Unit>("drawSpriteRegion", renderLayers, sprite2, textureWidth, textureHeight, u, v, x, y, width, height, color);
+            this.invokeMethod<Unit>("drawSpriteRegion", renderLayers, sprite2, textureWidth, textureHeight, u, v, x, y, width, height, color);
         else
-            context.invokeMethod<Unit>("drawSpriteStretched", renderLayers, sprite2, x, y, width, height, color);
+            this.invokeMethod<Unit>("drawSpriteStretched", renderLayers, sprite2, x, y, width, height, color);
+    }
+
+    fun DrawContext.drawGuiTextureFloat(
+        renderLayers: Function<Identifier, RenderLayer>,
+        sprite: Identifier,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        color: Int = -1
+    ) {
+        val guiAtlasManager = this.getProperty<GuiAtlasManager>("guiAtlasManager");
+        val sprite: Sprite = guiAtlasManager.getSprite(sprite);
+
+        val d: Float = 0b1 / 32768f;
+        this.drawTextureQuadFloat(renderLayers, sprite.atlasId, x, x + width, y, y + height,
+            sprite.minU + d, sprite.maxU + d, sprite.minV - d, sprite.maxV - d, color);
+    }
+
+    fun DrawContext.drawGuiTextureFloat(
+        renderLayers: Function<Identifier, RenderLayer>,
+        sprite: Identifier,
+        textureWidth: Float,
+        textureHeight: Float,
+        u: Float,
+        v: Float,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        color: Int = -1
+    ) {
+        val guiAtlasManager = this.getProperty<GuiAtlasManager>("guiAtlasManager");
+        val sprite: Sprite = guiAtlasManager.getSprite(sprite);
+
+        val d: Float = 0b1 / 32768f;
+        if (width != 0f && height != 0f) {
+            this.drawTextureQuadFloat(
+                renderLayers,
+                sprite.atlasId,
+                x,
+                x + width,
+                y,
+                y + height,
+                sprite.getFrameU(u / textureWidth) + d,
+                sprite.getFrameU((u + width) / textureWidth) + d,
+                sprite.getFrameV(v / textureHeight) - d,
+                sprite.getFrameV((v + height) / textureHeight) - d,
+                color
+            )
+        }
+    }
+
+    fun DrawContext.drawTextureQuadFloat(
+        renderLayers: Function<Identifier, RenderLayer>,
+        texture: Identifier,
+        x1: Float,
+        x2: Float,
+        y1: Float,
+        y2: Float,
+        u1: Float,
+        u2: Float,
+        v1: Float,
+        v2: Float,
+        color: Int
+    ) {
+        val renderLayer: RenderLayer = renderLayers.apply(texture);
+        val matrix: Matrix4f = this.matrices.peek().positionMatrix;
+        val vertexConsumer = this.getProperty<VertexConsumerProvider.Immediate>("vertexConsumers").getBuffer(renderLayer);
+
+        vertexConsumer.vertex(matrix, x1, y1, 0f).texture(u1, v1).color(color);
+        vertexConsumer.vertex(matrix, x1, y2, 0f).texture(u1, v2).color(color);
+        vertexConsumer.vertex(matrix, x2, y2, 0f).texture(u2, v2).color(color);
+        vertexConsumer.vertex(matrix, x2, y1, 0f).texture(u2, v1).color(color);
     }
 }

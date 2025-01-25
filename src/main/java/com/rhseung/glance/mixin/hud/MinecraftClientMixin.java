@@ -1,4 +1,4 @@
-package com.rhseung.glance.mixin;
+package com.rhseung.glance.mixin.hud;
 
 import com.rhseung.glance.event.RenderTickEvents;
 import com.rhseung.glance.hud.CrosshairHud;

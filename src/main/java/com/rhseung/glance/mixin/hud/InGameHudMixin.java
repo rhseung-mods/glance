@@ -9,6 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
@@ -34,16 +35,22 @@ public abstract class InGameHudMixin {
 
     @Shadow @Final private MinecraftClient client;
 
-    @Redirect(
+    @Inject(
         method = "renderCrosshair",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIII)V",
             ordinal = 0
-        )
+        ),
+        cancellable = true
     )
-    private void renderCrosshairMixin(DrawContext context, Function<Identifier, RenderLayer> renderLayers, Identifier sprite, int x, int y, int width, int height) {
-        CrosshairHud.INSTANCE.render(context, x, y);
+    private void renderCrosshairMixin(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        float scaleFactor = (float) client.getWindow().getScaleFactor();
+        float scaleCenterX = client.getWindow().getFramebufferWidth() / scaleFactor / 2f;
+        float scaleCenterY = client.getWindow().getFramebufferHeight() / scaleFactor / 2f;
+
+        CrosshairHud.INSTANCE.render(context, scaleCenterX, scaleCenterY);
+        ci.cancel();
     }
 
     @Redirect(
