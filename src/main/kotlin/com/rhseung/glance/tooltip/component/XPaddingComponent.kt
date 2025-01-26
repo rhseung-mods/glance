@@ -18,6 +18,8 @@ class XPaddingComponent(val size: Int) : GlanceTooltipComponent {
         innerWidth: Int,
         innerHeight: Int,
         x0: Int,
-        y0: Int
+        y0: Int,
+        outerX: Int,
+        outerY: Int
     ) {}
 }

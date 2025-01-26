@@ -19,8 +19,13 @@ class ShiftedComponent(val component: TooltipComponent, val dx: Int = 0, val dy:
         innerWidth: Int,
         innerHeight: Int,
         x0: Int,
-        y0: Int
+        y0: Int,
+        outerX: Int,
+        outerY: Int
     ) {
-        component.drawItems(textRenderer, x0 + dx, y0 + dy, innerWidth, innerHeight, context);
+        if (component is GlanceTooltipComponent)
+            component.draw(context, textRenderer, innerWidth, innerHeight, x0 + dx, y0 + dy, outerX, outerY);
+        else
+            component.drawItems(textRenderer, x0 + dx, y0 + dy, innerWidth, innerHeight, context);
     }
 }

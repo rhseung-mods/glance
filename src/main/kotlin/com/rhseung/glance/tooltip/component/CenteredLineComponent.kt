@@ -51,7 +51,9 @@ class CenteredLineComponent(vararg components: TooltipComponent) : GlanceTooltip
         innerWidth: Int,
         innerHeight: Int,
         x0: Int,
-        y0: Int
+        y0: Int,
+        outerX: Int,
+        outerY: Int
     ) {
         var x = x0;
         var y = y0;
@@ -68,8 +70,12 @@ class CenteredLineComponent(vararg components: TooltipComponent) : GlanceTooltip
 
                 val space = innerWidth - (beforeWidth + afterWidth);
                 x += (space - textWidth) / 2;
-                component.drawItems(textRenderer, x, y_, innerWidth, innerHeight, context);
+                component.draw(context, textRenderer, innerWidth, innerHeight,x, y_, outerX, outerY);
                 x = innerWidth - afterWidth;
+            }
+            else if (component is GlanceTooltipComponent) {
+                component.draw(context, textRenderer, innerWidth, innerHeight, x, y_, outerX, outerY);
+                x += component.getWidth(textRenderer);
             }
             else {
                 component.drawItems(textRenderer, x, y_, innerWidth, innerHeight, context);

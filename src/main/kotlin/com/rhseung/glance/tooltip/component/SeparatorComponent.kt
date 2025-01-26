@@ -33,7 +33,9 @@ class SeparatorComponent(val color: Color) : GlanceTooltipComponent {
         innerWidth: Int,
         innerHeight: Int,
         x0: Int,
-        y0: Int
+        y0: Int,
+        outerX: Int,
+        outerY: Int
     ) {
         val (front, back) = x0.toRangeSize(innerWidth).splitToTwo();
 

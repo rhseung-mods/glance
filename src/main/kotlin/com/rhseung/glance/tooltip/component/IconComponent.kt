@@ -19,7 +19,9 @@ class IconComponent(val icon: Icon) : GlanceTooltipComponent {
         innerWidth: Int,
         innerHeight: Int,
         x0: Int,
-        y0: Int
+        y0: Int,
+        outerX: Int,
+        outerY: Int
     ) {
         icon.draw(context, textRenderer, x0, y0);
     }

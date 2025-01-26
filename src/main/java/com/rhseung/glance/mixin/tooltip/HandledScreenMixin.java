@@ -36,6 +36,6 @@ public class HandledScreenMixin {
 
         data.ifPresent(tooltipData -> components.add(TooltipComponent.of(tooltipData)));
 
-        Tooltip.INSTANCE.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, mouseX, mouseY, components, stack);
+        Tooltip.INSTANCE.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, mouseX, mouseY, components, stack, true);
     }
 }

@@ -21,10 +21,15 @@ class StackedComponent(vararg components: TooltipComponent) : GlanceTooltipCompo
         innerWidth: Int,
         innerHeight: Int,
         x0: Int,
-        y0: Int
+        y0: Int,
+        outerX: Int,
+        outerY: Int
     ) {
         for (component in components) {
-            component.drawItems(textRenderer, x0, y0, innerWidth, innerHeight, context);
+            if (component is GlanceTooltipComponent)
+                component.draw(context, textRenderer, innerWidth, innerHeight, x0, y0, outerX, outerY);
+            else
+                component.drawItems(textRenderer, x0, y0, innerWidth, innerHeight, context);
         }
     }
 }

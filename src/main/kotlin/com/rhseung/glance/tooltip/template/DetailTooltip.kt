@@ -1,10 +1,11 @@
 package com.rhseung.glance.tooltip.template
 
 import com.rhseung.glance.tooltip.TooltipDecor
-import com.rhseung.glance.tooltip.component.Armor3DComponent
+import com.rhseung.glance.tooltip.component.ArmorStand3DComponent
 import com.rhseung.glance.tooltip.component.BoxComponent
 import com.rhseung.glance.tooltip.component.CenteredLineComponent
 import com.rhseung.glance.tooltip.component.CenteredTextComponent
+import com.rhseung.glance.tooltip.component.FloatingTooltipComponent
 import com.rhseung.glance.tooltip.component.ItemStackComponent
 import com.rhseung.glance.tooltip.component.LineComponent
 import com.rhseung.glance.tooltip.component.SeparatorComponent
@@ -22,9 +23,10 @@ import net.minecraft.item.ItemStack
 class DetailTooltip(
     titles: List<TextComponent>,
     components: List<TooltipComponent>,
+    floatingComponents: List<FloatingTooltipComponent>,
     theme: TooltipDecor.Theme,
     stack: ItemStack,
-) : GlanceTooltip(titles, components, theme) {
+) : GlanceTooltip(titles, components, floatingComponents, theme) {
 
     override var tooltip: MutableList<TooltipComponent>;
 
@@ -35,7 +37,7 @@ class DetailTooltip(
                 StackedComponent(
                     BoxComponent(16, 16, theme),
                     ShiftedComponent((stack.item is ArmorItem)
-                        .ifElse(Armor3DComponent(stack), ItemStackComponent(stack, 16)),
+                        .ifElse(ArmorStand3DComponent(stack), ItemStackComponent(stack, 16)),
                     1, 1)
                 ),
                 XPaddingComponent(3),

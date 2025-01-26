@@ -2,6 +2,8 @@ package com.rhseung.glance.tooltip
 
 import com.mojang.blaze3d.systems.RenderSystem
 import com.rhseung.glance.tooltip.TooltipConstants.Padding.TOOLTIP_FRAME_MARGIN
+import com.rhseung.glance.tooltip.component.FloatingTooltipComponent
+import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.TextComponent
 import com.rhseung.glance.tooltip.content.GlanceTooltipContent
 import com.rhseung.glance.tooltip.content.TooltipContentRegistry
@@ -13,10 +15,12 @@ import com.rhseung.glance.util.Util
 import com.rhseung.glance.util.Util.get
 import com.rhseung.glance.util.Util.toRangeSize
 import com.rhseung.glance.util.Util.toText
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gl.ShaderProgramKeys
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner
 import net.minecraft.client.gui.tooltip.OrderedTextTooltipComponent
 import net.minecraft.client.gui.tooltip.TooltipComponent
 import net.minecraft.client.gui.tooltip.TooltipPositioner
@@ -24,8 +28,76 @@ import net.minecraft.client.render.RenderLayer
 import net.minecraft.item.ItemStack
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Style
+import net.minecraft.text.Text
 
 object Tooltip {
+    fun getTooltip(
+        tooltipComponents: List<TooltipComponent>,
+        stack: ItemStack? = null,
+        canDetailTooltip: Boolean = true,
+        theme: TooltipDecor.Theme? = null
+    ): GlanceTooltip? {
+        val originalComponents: List<TooltipComponent> = tooltipComponents.map { component ->
+            if (component is OrderedTextTooltipComponent) {
+                val text: OrderedText = component["text"];
+                return@map TextComponent(text.toText());
+            }
+            else
+                return@map component;
+        };
+
+        val titleStyle: Style? = Util.getStyle((originalComponents[0] as? TextComponent)?.text);
+
+        val titleEndIdx: Int = originalComponents
+            .indexOfFirst { it !is TextComponent || Util.getStyle(it.text) != titleStyle }
+            .takeIf { it != -1 } ?: originalComponents.size;
+
+        val titleComponents: List<TextComponent> = originalComponents
+            .subList(0, titleEndIdx)
+            .map { it as TextComponent };
+
+        if (titleComponents.isEmpty())
+            return null;
+
+        val components: MutableList<TooltipComponent> = originalComponents
+            .subList(titleEndIdx, originalComponents.size)
+            .dropWhile { it is TextComponent && it.text.string.isEmpty() }
+            .toMutableList();
+
+        val floatingComponents: MutableList<FloatingTooltipComponent> = mutableListOf();
+
+        if (stack != null) {
+            TooltipContentRegistry.find(stack.item, stack)
+                .flatMap(GlanceTooltipContent::getComponents)
+                .filter {
+                    if (it.components.size == 1 && it.components[0] is FloatingTooltipComponent) {
+                        floatingComponents.add(it.components[0] as FloatingTooltipComponent);
+                        false;
+                    }
+                    else
+                        true;
+                }
+                .let { components.addAll(0, it) };
+        }
+
+        val color: Color? = titleStyle?.color?.rgb?.let(::Color);
+
+        val theme: TooltipDecor.Theme =
+            if (theme != null)
+                theme;
+            else if (stack != null)
+                TooltipDecor.themeFromItem(stack);
+            else if (color != null && color != Color.WHITE)
+                TooltipDecor.Theme(color);
+            else
+                TooltipDecor.Themes.DEFAULT;
+
+        return if (stack != null && Screen.hasShiftDown() && canDetailTooltip)
+            DetailTooltip(titleComponents, components, floatingComponents, theme, stack);
+        else
+            DefaultTooltip(titleComponents, components, floatingComponents, theme);
+    }
+
     fun drawBackground(
         context: DrawContext,
         innerX: IntRange,
@@ -195,58 +267,19 @@ object Tooltip {
         mouseX: Int,
         mouseY: Int,
         tooltipComponents: List<TooltipComponent>,
-        stack: ItemStack? = null
+        stack: ItemStack? = null,
+        canDetailTooltip: Boolean = true
     ) {
-        val originalComponents: List<TooltipComponent> = tooltipComponents.map { component ->
-            if (component is OrderedTextTooltipComponent) {
-                val text: OrderedText = component["text"];
-                return@map TextComponent(text.toText());
-            }
-            else
-                return@map component;
-        };
+        val tooltip = getTooltip(tooltipComponents, stack, canDetailTooltip) ?: return;
 
-        val titleStyle: Style? = Util.getStyle((originalComponents[0] as? TextComponent)?.text);
-
-        val titleEndIdx: Int = originalComponents
-            .indexOfFirst { it !is TextComponent || Util.getStyle(it.text) != titleStyle }
-            .takeIf { it != -1 } ?: originalComponents.size;
-
-        val titleComponents: List<TextComponent> = originalComponents
-            .subList(0, titleEndIdx)
-            .map { it as TextComponent };
-
-        if (titleComponents.isEmpty())
-            return;
-
-        val components: MutableList<TooltipComponent> = originalComponents
-            .subList(titleEndIdx, originalComponents.size)
-            .dropWhile { it is TextComponent && it.text.string.isEmpty() }
-            .toMutableList();
-
-        if (stack != null) {
-            TooltipContentRegistry.find(stack.item, stack)
-                .map(GlanceTooltipContent::getComponents)
-                .forEach { components.addAll(0, it) }
-        }
-
-        val color: Color? = titleStyle?.color?.rgb?.let(::Color);
-
-        val theme: TooltipDecor.Theme =
-            if (stack != null)
-                TooltipDecor.themeFromItem(stack);
-            else if (color != null && color != Color.WHITE)
-                TooltipDecor.Theme(color);
-            else
-                TooltipDecor.Themes.DEFAULT;
-
-        val tooltip: GlanceTooltip =
-            if (stack != null && Screen.hasShiftDown())
-                DetailTooltip(titleComponents, components, theme, stack);
-            else
-                DefaultTooltip(titleComponents, components, theme);
-
-        this.draw(context, textRenderer, positioner, mouseX, mouseY, tooltip);
+        this.draw(
+            context,
+            textRenderer,
+            positioner,
+            mouseX,
+            mouseY,
+            tooltip
+        );
     }
 
     fun draw(
@@ -282,7 +315,36 @@ object Tooltip {
 
         context.matrices.push();
         context.matrices.translate(0f, 0f, z.toFloat());
-        tooltip.draw(context, textRenderer, innerX.first, innerY.first);
+        tooltip.draw(context, textRenderer, innerX.first, innerY.first, x, y);
         context.matrices.pop();
+    }
+
+    fun draw(
+        context: DrawContext,
+        textRenderer: TextRenderer,
+        mouseX: Int,
+        mouseY: Int,
+        stack: ItemStack,
+        canDetailTooltip: Boolean = true
+    ) {
+        val components: MutableList<TooltipComponent> = Screen
+            .getTooltipFromItem(MinecraftClient.getInstance(), stack)
+            .map(::TextComponent)
+            .toMutableList();
+
+        if (stack.tooltipData.isPresent)
+            components.add(TooltipComponent.of(stack.tooltipData.get()));
+
+        this.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, mouseX, mouseY, components, stack, canDetailTooltip);
+    }
+
+    fun draw(
+        context: DrawContext,
+        textRenderer: TextRenderer,
+        mouseX: Int,
+        mouseY: Int,
+        text: Text,
+    ) {
+        this.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, mouseX, mouseY, listOf(TextComponent(text)), null, false);
     }
 }

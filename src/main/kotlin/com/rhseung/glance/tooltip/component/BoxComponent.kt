@@ -24,7 +24,9 @@ class BoxComponent(
         innerWidth: Int,
         innerHeight: Int,
         x0: Int,
-        y0: Int
+        y0: Int,
+        outerX: Int,
+        outerY: Int
     ) {
         val innerX = x0 + 1;
         val innerY = y0 + 1;

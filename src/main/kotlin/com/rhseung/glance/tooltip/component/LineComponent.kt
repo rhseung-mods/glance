@@ -51,7 +51,9 @@ class LineComponent(vararg components: TooltipComponent) : GlanceTooltipComponen
         innerWidth: Int,
         innerHeight: Int,
         x0: Int,
-        y0: Int
+        y0: Int,
+        outerX: Int,
+        outerY: Int
     ) {
         var x = x0;
         var y = y0;
@@ -64,10 +66,13 @@ class LineComponent(vararg components: TooltipComponent) : GlanceTooltipComponen
 
                 val space = innerWidth - (beforeWidth + afterWidth);
                 x += (space - textWidth) / 2;
-                component.drawItems(textRenderer, x, y, innerWidth, innerHeight, context);
+                component.draw(context, textRenderer, innerWidth, innerHeight, x, y, outerX, outerY);
                 x = innerWidth - afterWidth;
             }
-            else {
+            else if (component is GlanceTooltipComponent) {
+                component.draw(context, textRenderer, innerWidth, innerHeight, x, y, outerX, outerY);
+                x += component.getWidth(textRenderer);
+            } else {
                 component.drawItems(textRenderer, x, y, innerWidth, innerHeight, context);
                 x += component.getWidth(textRenderer);
             }

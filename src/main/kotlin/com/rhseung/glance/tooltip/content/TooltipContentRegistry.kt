@@ -23,6 +23,8 @@ object TooltipContentRegistry {
 
     fun register() {
         AttributeContent.register();
+        BundleContent.register();
+        ContainerContent.register();
         DurabilityContent.register();
         EnchantmentContent.register();
         FoodContent.register();

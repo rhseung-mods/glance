@@ -14,7 +14,16 @@ class CenteredTextComponent(val text: Text, val theme: TooltipDecor.Theme) : Gla
         return textRenderer.getWidth(text);
     }
 
-    override fun draw(context: DrawContext, textRenderer: TextRenderer, innerWidth: Int, innerHeight: Int, x0: Int, y0: Int) {
+    override fun draw(
+        context: DrawContext,
+        textRenderer: TextRenderer,
+        innerWidth: Int,
+        innerHeight: Int,
+        x0: Int,
+        y0: Int,
+        outerX: Int,
+        outerY: Int
+    ) {
         if (theme.title != null) {
             val coloredText = text.copy().withColor(theme.title.toInt());
             context.drawText(textRenderer, coloredText, x0, y0, -1, true);

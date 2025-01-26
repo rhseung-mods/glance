@@ -41,17 +41,8 @@ public abstract class DrawContextMixin {
             cancellable = true
     )
     public void drawItemTooltipMixin(TextRenderer textRenderer, ItemStack stack, int x, int y, CallbackInfo ci) {
-        List<TooltipComponent> components = new java.util.ArrayList<>();
-        List<Text> texts = Screen.getTooltipFromItem(MinecraftClient.getInstance(), stack);
-
-        if (!texts.isEmpty())
-            components.addAll(texts.stream().map(TextComponent::new).toList());
-        if (stack.getTooltipData().isPresent())
-            components.add(TooltipComponent.of(stack.getTooltipData().get()));
-
         DrawContext context = (DrawContext) (Object) this;
-        Tooltip.INSTANCE.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, x, y, components, stack);
-
+        Tooltip.INSTANCE.draw(context, textRenderer, x, y, stack, true);
         ci.cancel();
     }
 
@@ -69,7 +60,7 @@ public abstract class DrawContextMixin {
         data.ifPresent(tooltipData -> components.add(TooltipComponent.of(tooltipData)));
 
         DrawContext context = (DrawContext) (Object) this;
-        Tooltip.INSTANCE.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, x, y, components, null);
+        Tooltip.INSTANCE.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, x, y, components, null, true);
 
         ci.cancel();
     }
@@ -92,7 +83,7 @@ public abstract class DrawContextMixin {
         List<TooltipComponent> components = new java.util.ArrayList<>(text.stream().map(TextComponent::new).toList());
 
         DrawContext context = (DrawContext) (Object) this;
-        Tooltip.INSTANCE.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, x, y, components, null);
+        Tooltip.INSTANCE.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, x, y, components, null, true);
 
         ci.cancel();
     }
@@ -105,7 +96,7 @@ public abstract class DrawContextMixin {
     private void drawTooltipMixin(TextRenderer textRenderer, List<TooltipComponent> components, int x, int y, TooltipPositioner positioner, Identifier texture, CallbackInfo ci) {
         DrawContext context = (DrawContext) (Object) this;
 
-        Tooltip.INSTANCE.draw(context, textRenderer, positioner, x, y, components, null);
+        Tooltip.INSTANCE.draw(context, textRenderer, positioner, x, y, components, null, true);
 
         ci.cancel();
     }

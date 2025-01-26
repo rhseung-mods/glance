@@ -21,7 +21,9 @@ class ItemStackComponent(val itemStack: ItemStack, val size: Int = 16) : GlanceT
         innerWidth: Int,
         innerHeight: Int,
         x0: Int,
-        y0: Int
+        y0: Int,
+        outerX: Int,
+        outerY: Int
     ) {
         context.matrices.push();
         context.matrices.scale(ratio, ratio, 1f);

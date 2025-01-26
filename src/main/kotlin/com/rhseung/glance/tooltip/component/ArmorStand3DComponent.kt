@@ -14,7 +14,7 @@ import org.joml.Quaternionf
 import kotlin.math.PI
 import kotlin.math.atan
 
-class Armor3DComponent(
+class ArmorStand3DComponent(
     val itemStack: ItemStack
 ) : GlanceTooltipComponent {
 
@@ -42,7 +42,9 @@ class Armor3DComponent(
         innerWidth: Int,
         innerHeight: Int,
         x0: Int,
-        y0: Int
+        y0: Int,
+        outerX: Int,
+        outerY: Int
     ) {
         val innerx = x0 + 1;
         val innery = y0 + 1;

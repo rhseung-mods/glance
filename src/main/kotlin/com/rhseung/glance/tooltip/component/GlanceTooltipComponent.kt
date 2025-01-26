@@ -15,6 +15,8 @@ interface GlanceTooltipComponent : TooltipComponent {
         innerHeight: Int,
         x0: Int,
         y0: Int,
+        outerX: Int,
+        outerY: Int,
     );
 
     override fun drawItems(
@@ -25,6 +27,6 @@ interface GlanceTooltipComponent : TooltipComponent {
         height: Int,
         context: DrawContext
     ) {
-        draw(context, textRenderer, width, height, x, y);
+        throw UnsupportedOperationException();
     }
 }

@@ -24,7 +24,7 @@ class HoneyLevelOverlay(item: Item, itemStack: ItemStack) : GlanceStackOverlay(i
         val i = x + 1;
         val j = y + 13;
 
-        context.fill(RenderLayer.getGui(), i, j, i + 14, j + 2, 200, Color.BLACK.toInt());
+        context.fill(RenderLayer.getGui(), i, j, i + 14, j + 2, 200, Color.BLACK.toInt(150));
         for (level in 0..<honeyLevel) {
             context.fill(RenderLayer.getGui(), i + 3 * level, j, i + 3 * level + 2, j + 1, 200, Color.GOLD.toInt());
         }
