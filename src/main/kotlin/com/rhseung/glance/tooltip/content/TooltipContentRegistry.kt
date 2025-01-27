@@ -21,14 +21,22 @@ object TooltipContentRegistry {
             .map { (content, _) -> content(item, itemStack) };
     }
 
+    /**
+     * 순서 중요함.
+     */
     fun register() {
-        AttributeContent.register();
         BundleContent.register();
         ContainerContent.register();
-        DurabilityContent.register();
-        EnchantmentContent.register();
-        FoodContent.register();
-        FuelContent.register();
         MapContent.register();
+
+        AttributeContent.register();
+        FoodContent.register();
+        ArmorTrimContent.register();
+        EnchantmentContent.register();
+        DyedColorContent.register();
+        FuelContent.register();
+        DurabilityContent.register();
+        StatusEffectContent.register();
+        BeehiveContent.register();
     }
 }

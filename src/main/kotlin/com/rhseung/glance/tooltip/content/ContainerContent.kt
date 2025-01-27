@@ -8,23 +8,27 @@ import net.minecraft.component.type.DyedColorComponent
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.text.Text
 
-class ContainerContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item, itemStack) {
+class ContainerContent(item: Item, itemStack: ItemStack) : FloatingTooltipContent(item, itemStack) {
     override fun getComponents(): List<LineComponent> {
         val containerComponent = itemStack.get(DataComponentTypes.CONTAINER)!!;
+        val customName: Text? = itemStack.get(DataComponentTypes.CUSTOM_NAME);
         val color = if (item is BlockItem && item.block is ShulkerBoxBlock)
             (item.block as ShulkerBoxBlock).color?.entityColor ?: -1;
         else
             DyedColorComponent.getColor(itemStack, -1);
 
-        // todo: bundle
+        // todo: selectedIndex 구현
+        // todo: size registry, mod support (how?)
+
         return listOf(LineComponent(
             ContainerComponent(
                 containerComponent.stream().toList(),
                 3,
                 9,
                 color
-            )   // todo: size registry, mod support (how?)
+            ).let { if (customName != null) it.withTitle(customName) else it }
         ));
     }
 

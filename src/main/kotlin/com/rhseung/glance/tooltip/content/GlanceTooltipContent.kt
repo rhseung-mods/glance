@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack
 abstract class GlanceTooltipContent(open val item: Item, open val itemStack: ItemStack) {
     abstract fun getComponents(): List<LineComponent>;
 
-    // todo: shift 시 getShiftComponents(): List<TextComponent> 호출
+    abstract fun getShiftComponents(): List<LineComponent>;
 
     interface Factory {
         fun register();

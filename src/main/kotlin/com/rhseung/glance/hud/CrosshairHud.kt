@@ -9,7 +9,6 @@ import com.rhseung.glance.util.Util.drawGuiTextureFloat
 import com.rhseung.glance.util.Util.ifElse
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.hud.InGameHud
 import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.client.option.AttackIndicator
 import net.minecraft.client.render.RenderLayer
@@ -135,9 +134,9 @@ object CrosshairHud {
         }.toInt();
 
         if (isAimingItem(activeStack)) {
-            val useTime: Int = player.itemUseTime;
+            val useTicks: Int = player.itemUseTime;
 
-            val maxUseTime: Int = when (activeStack.item) {
+            val maxUseTicks: Int = when (activeStack.item) {
                 is BowItem -> 20;   // todo: mod support
                 is TridentItem -> TridentItem.MIN_DRAW_DURATION;
                 is CrossbowItem -> activeStack.getMaxUseTime(player);
@@ -145,9 +144,9 @@ object CrosshairHud {
             };
 
             val useRatio: Float = when {
-                activeStack.item is BowItem -> BowItem.getPullProgress(useTime);
+                activeStack.item is BowItem -> BowItem.getPullProgress(useTicks);
                 CrossbowItem.isCharged(activeStack) -> 1f
-                else -> useTime.toFloat() / maxUseTime;
+                else -> useTicks.toFloat() / maxUseTicks;
             }.coerceIn(0f, 1f);
 
             val diff: Float = (1f - useRatio) * 4 - 1f;    // 3f -> -1f

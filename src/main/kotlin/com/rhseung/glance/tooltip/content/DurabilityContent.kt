@@ -13,21 +13,26 @@ import net.minecraft.client.gui.screen.ingame.AnvilScreen
 import net.minecraft.client.gui.screen.ingame.GrindstoneScreen
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.text.MutableText
 
 class DurabilityContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item, itemStack) {
-    override fun getComponents(): List<LineComponent> {
-        val durability = itemStack.maxDamage - itemStack.damage;
-        val durabilityText = (durability.toString() with Color.WHITE)
-            .append("/" with Color.DARK_GRAY)
-            .append(itemStack.maxDamage.toString() with Color.DARK_GRAY);
+    val durability = itemStack.maxDamage - itemStack.damage;
+    val durabilityText: MutableText = (durability.toString() with Color.WHITE)
+        .append(("/" + itemStack.maxDamage.toString()) with Color.GRAY);
 
-        val durabilityComponent = LineComponent(
+    override fun getComponents(): List<LineComponent> {
+        return listOf(LineComponent(
             IconComponent(TooltipIcon.DURABILITY),
             XPaddingComponent(SPACE),
-            TextComponent(durabilityText, shift = 1)
-        );
+            TextComponent(durabilityText, shiftY = 1)
+        ));
+    }
 
-        return listOf(durabilityComponent);
+    override fun getShiftComponents(): List<LineComponent> {
+        // translate: "내구도: "
+        return listOf(LineComponent(
+            TextComponent(("Durability: " with Color.GRAY).append(durabilityText))
+        ));
     }
 
     companion object : Factory {

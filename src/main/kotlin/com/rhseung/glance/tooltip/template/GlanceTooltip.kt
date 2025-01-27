@@ -1,7 +1,6 @@
 package com.rhseung.glance.tooltip.template
 
 import com.rhseung.glance.tooltip.TooltipDecor
-import com.rhseung.glance.tooltip.component.FloatingTooltipComponent
 import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.TextComponent
 import net.minecraft.client.font.TextRenderer
@@ -11,7 +10,7 @@ import net.minecraft.client.gui.tooltip.TooltipComponent
 abstract class GlanceTooltip(
     open val titles: List<TextComponent>,
     open val components: List<TooltipComponent>,
-    open val floatingComponents: List<FloatingTooltipComponent>,
+    open val floatingComponents: List<GlanceTooltipComponent>,
     open val theme: TooltipDecor.Theme
 ) {
     protected abstract var tooltip: MutableList<TooltipComponent>;
@@ -37,11 +36,11 @@ abstract class GlanceTooltip(
         }
 
         x = outerX;
-        y = outerY - 2 * floatingComponents.size - floatingComponents.sumOf { it.getHeightExact(textRenderer) };
+        y = outerY - 2 * floatingComponents.size - floatingComponents.sumOf { it.getHeight(textRenderer) };
 
         for (component in floatingComponents) {
             component.draw(context, textRenderer, getWidth(textRenderer), getHeight(textRenderer), x, y, outerX, outerY);
-            y += component.getHeightExact(textRenderer) + 2;
+            y += component.getHeight(textRenderer) + 2;
         }
     }
 }

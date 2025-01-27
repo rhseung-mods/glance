@@ -17,7 +17,7 @@ import com.rhseung.glance.tooltip.icon.SignIcon
 import com.rhseung.glance.tooltip.icon.SignIcon.Companion.toSignIcon
 import com.rhseung.glance.tooltip.icon.SlotIcon.Companion.toIcon
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.EnchantmentEffectComponentTypes
 import net.minecraft.component.type.AttributeModifierSlot
@@ -31,18 +31,19 @@ import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.screen.ScreenTexts
+import net.minecraft.text.MutableText
+import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import java.util.SortedMap
 import kotlin.math.abs
 
 class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item, itemStack) {
-    private val attributeModifiers = item.components.getOrDefault(
-        DataComponentTypes.ATTRIBUTE_MODIFIERS,
-        AttributeModifiersComponent.DEFAULT
-    ).modifiers;
-    private val player = MinecraftClient.getInstance().player;
+    private val player: ClientPlayerEntity? = MinecraftClient.getInstance().player;
     private val lines: SortedMap<Slot, LineComponent> = sortedMapOf(compareBy(Slot::ordinal));
+    private val texts: SortedMap<Slot, MutableList<TextComponent>> = sortedMapOf(compareBy(Slot::ordinal));
 
-    private fun add(slot: Slot, line: LineComponent?) {
+    private fun addIcon(slot: Slot, line: LineComponent?) {
         if (line == null) return;
 
         if (slot !in lines)
@@ -51,16 +52,29 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
             lines[slot]!!.add(XPaddingComponent(NEXT_ICON)).add(line);
     }
 
+    private fun addText(slot: Slot, text: TextComponent?) {
+        if (text == null) return;
+
+        if (slot !in texts) {
+            texts.putIfAbsent(slot, mutableListOf());
+            texts[slot]!!.add(TextComponent(Text.translatable(slot.translationKey).formatted(Formatting.GRAY)));
+        }
+
+        texts[slot]!!.add(text);
+    }
+
     fun defaultAttribute(
-        attributeModifiers: List<AttributeModifiersComponent.Entry>,
+        stack: ItemStack,
         slot: AttributeModifierSlot,
         attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
     ) {
-        attributeModifiers.forEach { entry ->
-            if (!entry.slot.equals(slot))
-                return@forEach;
+        val attributeModifiers = stack
+            .getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT);
 
-            attributeModifierConsumer(entry.attribute, entry.modifier);
+        attributeModifiers.modifiers.forEach { entry ->
+            if (entry.slot.equals(slot)) {
+                attributeModifierConsumer(entry.attribute, entry.modifier);
+            }
         }
     }
 
@@ -75,7 +89,8 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
         /**
          * [net.minecraft.enchantment.EnchantmentHelper.forEachEnchantment]
          */
-        val itemEnchantmentsComponent = stack.getOrDefault(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT);
+        val itemEnchantmentsComponent = stack
+            .getOrDefault(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT);
 
         itemEnchantmentsComponent.enchantmentEntries.forEach { (enchantment, level) ->
             enchantment.value().getEffect(EnchantmentEffectComponentTypes.ATTRIBUTES).forEach { effect ->
@@ -93,25 +108,27 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
         stack: ItemStack,
         attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
     ) {
-        val potionContentsComponent = stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
+        val potionContentsComponent = stack
+            .getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
 
         potionContentsComponent.effects.forEach { effectInstance ->
-            effectInstance.effectType.value().forEachAttributeModifier(effectInstance.amplifier, attributeModifierConsumer)
+            effectInstance.effectType.value()
+                .forEachAttributeModifier(effectInstance.amplifier, attributeModifierConsumer)
         }
     }
 
     /**
      * @see net.minecraft.item.ItemStack.appendAttributeModifierTooltip
      */
-    private fun attributeTooltip(
+    private fun attributeIconTooltip(
         attribute: RegistryEntry<EntityAttribute>,
         modifier: EntityAttributeModifier,
-        blTrueAttributes: List<RegistryEntry<EntityAttribute>>
+        basedAttributes: List<RegistryEntry<EntityAttribute>>
     ): LineComponent? {
-        var value = modifier.value;
+        var value: Double = modifier.value;
         var isFixed = false;
 
-        if (player != null && blTrueAttributes.find { it.matches(attribute) } != null) {
+        if (player != null && basedAttributes.find { it.matches(attribute) } != null) {
             value += player.getAttributeBaseValue(attribute);
             isFixed = true;
         }
@@ -142,13 +159,65 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
                 .add(XPaddingComponent(BETWEEN_SIGN_VALUE));
         }
 
-        return ret.add(TextComponent(text, shift = 1));
+        return ret.add(TextComponent(text, shiftY = 1));
+    }
+
+    /**
+     * @see net.minecraft.item.ItemStack.appendAttributeModifierTooltip
+     */
+    private fun attributeTextTooltip(
+        attribute: RegistryEntry<EntityAttribute>,
+        modifier: EntityAttributeModifier,
+        basedAttributes: List<RegistryEntry<EntityAttribute>>
+    ): TextComponent? {
+        var value: Double = modifier.value;
+        var isFixed = false;
+
+        if (player != null && basedAttributes.find { it.matches(attribute) } != null) {
+            value += player.getAttributeBaseValue(attribute);
+            isFixed = true;
+        }
+
+        if (value == 0.0)
+            return null;
+
+        if (modifier.operation == Operation.ADD_MULTIPLIED_BASE || modifier.operation == Operation.ADD_MULTIPLIED_TOTAL)
+            value *= 100;
+        else if (attribute.matches(EntityAttributes.KNOCKBACK_RESISTANCE))
+            value *= 10;
+
+        val text: MutableText = if (isFixed) {
+            ScreenTexts.space().append(
+                Text.translatable(
+                    "attribute.modifier.equals." + modifier.operation.id,
+                    AttributeModifiersComponent.DECIMAL_FORMAT.format(value),
+                    Text.translatable(attribute.value().translationKey)
+                ).formatted(Formatting.DARK_GREEN)
+            )
+        }
+        else if (value > 0) {
+            Text.translatable(
+                "attribute.modifier.plus." + modifier.operation.id,
+                AttributeModifiersComponent.DECIMAL_FORMAT.format(value),
+                Text.translatable(attribute.value().translationKey)
+            ).formatted(attribute.value().getFormatting(true))
+        }
+        else if (value < 0) {
+            Text.translatable(
+                "attribute.modifier.take." + modifier.operation.id,
+                AttributeModifiersComponent.DECIMAL_FORMAT.format(-value),
+                Text.translatable(attribute.value().translationKey)
+            ).formatted(attribute.value().getFormatting(false))
+        }
+        else throw IllegalStateException("impossible");
+
+        return TextComponent(text);
     }
 
     override fun getComponents(): List<LineComponent> {
         for (slot in AttributeModifierSlot.entries) {
-            defaultAttribute(attributeModifiers, slot) { attribute, modifier ->
-                val blTrueAttributes = listOf(
+            defaultAttribute(itemStack, slot) { attribute, modifier ->
+                val basedAttributes = listOf(
                     EntityAttributes.ATTACK_DAMAGE,
                     EntityAttributes.ATTACK_SPEED,
                     EntityAttributes.ARMOR,
@@ -156,16 +225,16 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
                     EntityAttributes.KNOCKBACK_RESISTANCE
                 );
 
-                this.add(slot.toSlot(), attributeTooltip(attribute, modifier, blTrueAttributes));
+                this.addIcon(slot.toSlot(), attributeIconTooltip(attribute, modifier, basedAttributes));
             }
 
             enchantmentAttribute(itemStack, slot) { attribute, modifier ->
-                this.add(slot.toSlot(), attributeTooltip(attribute, modifier, listOf()));
+                this.addIcon(slot.toSlot(), attributeIconTooltip(attribute, modifier, listOf()));
             }
         }
 
         potionAttribute(itemStack) { attribute, modifier ->
-            this.add(Slot.DRANK, attributeTooltip(attribute, modifier, listOf()));
+            this.addIcon(Slot.DRANK, attributeIconTooltip(attribute, modifier, listOf()));
         }
 
         if (lines.size > 1) {
@@ -182,13 +251,45 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
         return lines.sequencedValues().toList();
     }
 
+    override fun getShiftComponents(): List<LineComponent> {
+        for (slot in AttributeModifierSlot.entries) {
+            defaultAttribute(itemStack, slot) { attribute, modifier ->
+                val basedAttributes = listOf(
+                    EntityAttributes.ATTACK_DAMAGE,
+                    EntityAttributes.ATTACK_SPEED,
+                    EntityAttributes.ARMOR,
+                    EntityAttributes.ARMOR_TOUGHNESS,
+                    EntityAttributes.KNOCKBACK_RESISTANCE
+                );
+
+                this.addText(slot.toSlot(), attributeTextTooltip(attribute, modifier, basedAttributes));
+            }
+
+            enchantmentAttribute(itemStack, slot) { attribute, modifier ->
+                this.addText(slot.toSlot(), attributeTextTooltip(attribute, modifier, listOf()));
+            }
+        }
+
+        potionAttribute(itemStack) { attribute, modifier ->
+            this.addText(Slot.DRANK, attributeTextTooltip(attribute, modifier, listOf()));
+        }
+
+        val ret = mutableListOf<TextComponent>();
+        texts.forEach { (_, textComponents) ->
+            ret.addAll(textComponents);
+            ret.add(TextComponent(ScreenTexts.EMPTY));
+        }
+
+        return ret.slice(0..<ret.size - 1).map { LineComponent(it) };
+    }
+
     companion object : Factory {
         override fun register() {
             TooltipContentRegistry.register(::AttributeContent, AttributeContent::valid);
         }
 
         override fun valid(item: Item, itemStack: ItemStack): Boolean {
-            return !Screen.hasShiftDown();
+            return true;
         }
     }
 }

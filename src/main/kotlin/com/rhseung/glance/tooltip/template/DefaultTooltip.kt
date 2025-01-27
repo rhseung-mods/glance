@@ -2,7 +2,7 @@ package com.rhseung.glance.tooltip.template
 
 import com.rhseung.glance.tooltip.TooltipDecor
 import com.rhseung.glance.tooltip.component.CenteredLineComponent
-import com.rhseung.glance.tooltip.component.FloatingTooltipComponent
+import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.LineComponent
 import com.rhseung.glance.tooltip.component.SeparatorComponent
 import com.rhseung.glance.tooltip.component.TextComponent
@@ -14,7 +14,7 @@ import net.minecraft.client.gui.tooltip.TooltipComponent
 class DefaultTooltip(
     titles: List<TextComponent>,
     components: List<TooltipComponent>,
-    floatingComponents: List<FloatingTooltipComponent>,
+    floatingComponents: List<GlanceTooltipComponent>,
     theme: TooltipDecor.Theme
 ): GlanceTooltip(titles, components, floatingComponents, theme) {
 

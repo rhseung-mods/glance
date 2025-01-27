@@ -127,7 +127,7 @@ class Color {
     }
 
     override fun toString(): String {
-        return "#${Integer.toHexString(rgb())}";
+        return "#%06X".format(rgb());
     }
 
     fun darker(delta: Float): Color {

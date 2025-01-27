@@ -5,7 +5,7 @@ import com.rhseung.glance.tooltip.component.ArmorStand3DComponent
 import com.rhseung.glance.tooltip.component.BoxComponent
 import com.rhseung.glance.tooltip.component.CenteredLineComponent
 import com.rhseung.glance.tooltip.component.CenteredTextComponent
-import com.rhseung.glance.tooltip.component.FloatingTooltipComponent
+import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.ItemStackComponent
 import com.rhseung.glance.tooltip.component.LineComponent
 import com.rhseung.glance.tooltip.component.SeparatorComponent
@@ -23,7 +23,7 @@ import net.minecraft.item.ItemStack
 class DetailTooltip(
     titles: List<TextComponent>,
     components: List<TooltipComponent>,
-    floatingComponents: List<FloatingTooltipComponent>,
+    floatingComponents: List<GlanceTooltipComponent>,
     theme: TooltipDecor.Theme,
     stack: ItemStack,
 ) : GlanceTooltip(titles, components, floatingComponents, theme) {

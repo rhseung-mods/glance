@@ -14,11 +14,11 @@ import kotlin.math.ceil
 class NamedContainerComponent(
     val title: Text,
     stacks: List<ItemStack>,
-    minRow: Int,
-    maxColumn: Int,
+    row: Int,
+    col: Int,
     color: Int = -1,
     selectedStackIndex: Int = -1
-) : ContainerComponent(stacks, minRow, maxColumn, color, selectedStackIndex) {
+) : ContainerComponent(stacks, row, col, color, selectedStackIndex) {
     private val CONTAINER_TEXTURE: Identifier = ModMain.id("textures/gui/named_container.png");
 
     override val nineSlices = listOf(
@@ -28,12 +28,12 @@ class NamedContainerComponent(
     );
     override val background = NineSlice(28, 17, 18, 18);
 
-    override fun getWidthExact(textRenderer: TextRenderer): Int {
+    override fun getWidth(textRenderer: TextRenderer): Int {
         val textCol = ceil(textRenderer.getWidth(title) / 18f).toInt();
         return 5 + (18 * maxOf(col, textCol)) + 5;
     }
 
-    override fun getHeightExact(textRenderer: TextRenderer): Int {
+    override fun getHeight(textRenderer: TextRenderer): Int {
         return 17 + 18 * row + 5;
     }
 
@@ -85,6 +85,8 @@ class NamedContainerComponent(
         outerY: Int
     ) {
         super.draw(context, textRenderer, innerWidth, innerHeight, x0, y0, outerX, outerY);
-        context.drawText(textRenderer, title, x0 + 6, y0 + 6, 0x404040, false);   // todo: 배경색이 어두우면 자동으로 하얀색으로 바꾸기
+
+        val color = Color(color);
+        context.drawText(textRenderer, title, x0 + 6, y0 + 6, Color(0, 0f, 1f - color.V).toInt(), false);
     }
 }

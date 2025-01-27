@@ -1,21 +1,23 @@
 package com.rhseung.glance.mixin.tooltip;
 
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 @Mixin(PotionContentsComponent.class)
 public class PotionContentsComponentMixin {
-    @Redirect(
+    @Inject(
         method = "buildTooltip(Ljava/lang/Iterable;Ljava/util/function/Consumer;FF)V",
-        at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z")
+        at = @At("HEAD"),
+        cancellable = true
     )
-    private static boolean isEmptyMixin(List<?> list) {
-        // 본문이 !list.isEmpty() 였기 때문에 !를 한 번 앞에 붙여야 기본 긍정 조건문이 됨.
-        return !(!list.isEmpty() && Screen.hasShiftDown());
+    private static void buildTooltipMixin(Iterable<StatusEffectInstance> effects, Consumer<Text> textConsumer, float durationMultiplier, float tickRate, CallbackInfo ci) {
+        ci.cancel();
     }
 }

@@ -2,10 +2,11 @@ package com.rhseung.glance.tooltip
 
 import com.mojang.blaze3d.systems.RenderSystem
 import com.rhseung.glance.tooltip.TooltipConstants.Padding.TOOLTIP_FRAME_MARGIN
-import com.rhseung.glance.tooltip.component.FloatingTooltipComponent
 import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
+import com.rhseung.glance.tooltip.component.LineComponent
 import com.rhseung.glance.tooltip.component.TextComponent
-import com.rhseung.glance.tooltip.content.GlanceTooltipContent
+import com.rhseung.glance.tooltip.component.YPaddingComponent
+import com.rhseung.glance.tooltip.content.FloatingTooltipContent
 import com.rhseung.glance.tooltip.content.TooltipContentRegistry
 import com.rhseung.glance.tooltip.template.DefaultTooltip
 import com.rhseung.glance.tooltip.template.DetailTooltip
@@ -64,20 +65,45 @@ object Tooltip {
             .dropWhile { it is TextComponent && it.text.string.isEmpty() }
             .toMutableList();
 
-        val floatingComponents: MutableList<FloatingTooltipComponent> = mutableListOf();
+        val floatingComponents: MutableList<GlanceTooltipComponent> = mutableListOf();
+
+        val isDetail = stack != null && Screen.hasShiftDown() && canDetailTooltip;
 
         if (stack != null) {
-            TooltipContentRegistry.find(stack.item, stack)
-                .flatMap(GlanceTooltipContent::getComponents)
-                .filter {
-                    if (it.components.size == 1 && it.components[0] is FloatingTooltipComponent) {
-                        floatingComponents.add(it.components[0] as FloatingTooltipComponent);
-                        false;
+            val contents = TooltipContentRegistry.find(stack.item, stack);
+            val contentsComponents = mutableListOf<GlanceTooltipComponent>();
+
+            contents.forEach { content ->
+                val eachComponents: List<LineComponent> = if (isDetail) content.getShiftComponents() else content.getComponents();
+
+                if (eachComponents.isNotEmpty()) {
+                    if (content is FloatingTooltipContent) {
+                        floatingComponents.addAll(eachComponents);
                     }
-                    else
-                        true;
+                    else {
+                        if (contentsComponents.isNotEmpty() && (eachComponents.size > 1 || isDetail))
+                            contentsComponents.add(YPaddingComponent(8));
+
+                        contentsComponents.addAll(eachComponents);
+                    }
                 }
-                .let { components.addAll(0, it) };
+            };
+
+            if (contentsComponents.isNotEmpty()) {
+                if (isDetail) {
+                    if (components.isNotEmpty())
+                        components.add(YPaddingComponent(8));
+
+                    components.addAll(contentsComponents);
+                }
+                else {
+                    val front = mutableListOf(*contentsComponents.toTypedArray());
+                    if (components.isNotEmpty())
+                        front.add(YPaddingComponent(8));
+
+                    components.addAll(0, front);
+                }
+            }
         }
 
         val color: Color? = titleStyle?.color?.rgb?.let(::Color);
@@ -92,7 +118,7 @@ object Tooltip {
             else
                 TooltipDecor.Themes.DEFAULT;
 
-        return if (stack != null && Screen.hasShiftDown() && canDetailTooltip)
+        return if (isDetail)
             DetailTooltip(titleComponents, components, floatingComponents, theme, stack);
         else
             DefaultTooltip(titleComponents, components, floatingComponents, theme);
@@ -285,6 +311,35 @@ object Tooltip {
     fun draw(
         context: DrawContext,
         textRenderer: TextRenderer,
+        mouseX: Int,
+        mouseY: Int,
+        stack: ItemStack,
+        canDetailTooltip: Boolean = true
+    ) {
+        val components: MutableList<TooltipComponent> = Screen
+            .getTooltipFromItem(MinecraftClient.getInstance(), stack)
+            .map(::TextComponent)
+            .toMutableList();
+
+        if (stack.tooltipData.isPresent)
+            components.add(TooltipComponent.of(stack.tooltipData.get()));
+
+        this.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, mouseX, mouseY, components, stack, canDetailTooltip);
+    }
+
+    fun draw(
+        context: DrawContext,
+        textRenderer: TextRenderer,
+        mouseX: Int,
+        mouseY: Int,
+        text: Text,
+    ) {
+        this.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, mouseX, mouseY, listOf(TextComponent(text)), null, false);
+    }
+
+    fun draw(
+        context: DrawContext,
+        textRenderer: TextRenderer,
         positioner: TooltipPositioner,
         mouseX: Int,
         mouseY: Int,
@@ -317,34 +372,5 @@ object Tooltip {
         context.matrices.translate(0f, 0f, z.toFloat());
         tooltip.draw(context, textRenderer, innerX.first, innerY.first, x, y);
         context.matrices.pop();
-    }
-
-    fun draw(
-        context: DrawContext,
-        textRenderer: TextRenderer,
-        mouseX: Int,
-        mouseY: Int,
-        stack: ItemStack,
-        canDetailTooltip: Boolean = true
-    ) {
-        val components: MutableList<TooltipComponent> = Screen
-            .getTooltipFromItem(MinecraftClient.getInstance(), stack)
-            .map(::TextComponent)
-            .toMutableList();
-
-        if (stack.tooltipData.isPresent)
-            components.add(TooltipComponent.of(stack.tooltipData.get()));
-
-        this.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, mouseX, mouseY, components, stack, canDetailTooltip);
-    }
-
-    fun draw(
-        context: DrawContext,
-        textRenderer: TextRenderer,
-        mouseX: Int,
-        mouseY: Int,
-        text: Text,
-    ) {
-        this.draw(context, textRenderer, HoveredTooltipPositioner.INSTANCE, mouseX, mouseY, listOf(TextComponent(text)), null, false);
     }
 }

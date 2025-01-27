@@ -6,6 +6,7 @@ import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.texture.GuiAtlasManager
 import net.minecraft.client.texture.Scaling.Stretch
 import net.minecraft.client.texture.Sprite
+import net.minecraft.text.MutableText
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Style
 import net.minecraft.text.Text
@@ -26,7 +27,6 @@ object Util {
 
     fun Float.toStringPretty() = this.roundTo(2).toString().removeSuffix("0").removeSuffix(".");
 
-    // TODO: x0Hover..(x0Hover + tooltipWidth) => x0Hover with tooltipWidth
     fun Int.toRangeSize(size: Int) = this..<(this + size);
 
     fun IntRange.modify(startDelta: Int, endDelta: Int) = (this.first + startDelta)..(this.last + endDelta);
@@ -41,6 +41,8 @@ object Util {
     }
 
     fun <T> Boolean.ifElse(ifTrue: T, ifFalse: T): T = if (this) ifTrue else ifFalse;
+
+    fun Text.toMutableText(): MutableText = this.copy();
 
     fun getStyle(text: Text?): Style? {
         if (text == null)
@@ -66,7 +68,7 @@ object Util {
         }
     }
 
-    fun <T> Iterable<T>.joinTo(separator: T): List<T> {
+    fun <T, R: T> Iterable<T>.joinTo(separator: R): List<T> {
         val list = mutableListOf<T>()
         for (item in this) {
             list.add(item);

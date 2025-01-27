@@ -1,7 +1,6 @@
 package com.rhseung.glance.tooltip.content
 
 import com.rhseung.glance.tooltip.TooltipConstants
-import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.IconComponent
 import com.rhseung.glance.tooltip.component.LineComponent
 import com.rhseung.glance.tooltip.component.TextComponent
@@ -17,12 +16,22 @@ import net.minecraft.item.ItemStack
 class FuelContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item, itemStack) {
     private val burnTick = MinecraftClient.getInstance().world!!.fuelRegistry.getFuelTicks(itemStack);
     private val itemSmeltTick = 200;
-    private val burnAmount = burnTick.toFloat() / itemSmeltTick;
+    private val burnAmount: Float = burnTick.toFloat() / itemSmeltTick;
     private val burnAmountText = (TooltipConstants.Char.MULTIPLY + burnAmount.toStringPretty()) with Color.FUEL;
 
     override fun getComponents(): List<LineComponent> {
         return listOf(LineComponent(
-            IconComponent(TooltipIcon.FUEL), TextComponent(burnAmountText, shift = 1)
+            IconComponent(TooltipIcon.FUEL), TextComponent(burnAmountText, shiftY = 1)
+        ));
+    }
+
+    override fun getShiftComponents(): List<LineComponent> {
+        // translate: "연소: "
+        return listOf(LineComponent(
+            TextComponent(("Burn " with Color.GRAY)
+                .append((burnAmount.toStringPretty() + "x") with Color.WHITE)
+                .append(" Item${if (burnAmount == 1f) "" else "s"}" with Color.GRAY)
+            )
         ));
     }
 

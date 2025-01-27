@@ -10,16 +10,16 @@ import net.minecraft.item.FilledMapItem
 import net.minecraft.item.map.MapState
 import net.minecraft.util.Identifier
 
-class MapComponent(val mapId: MapIdComponent) : FloatingTooltipComponent {
+class MapComponent(val mapId: MapIdComponent) : GlanceTooltipComponent {
     val background = Identifier.ofVanilla("textures/map/map_background.png");
     val client = MinecraftClient.getInstance();
     val mapRenderer = client.mapRenderer;
 
-    override fun getWidthExact(textRenderer: TextRenderer): Int {
+    override fun getWidth(textRenderer: TextRenderer): Int {
         return 64;
     }
 
-    override fun getHeightExact(textRenderer: TextRenderer): Int {
+    override fun getHeight(textRenderer: TextRenderer): Int {
         return 64;
     }
 
@@ -43,7 +43,7 @@ class MapComponent(val mapId: MapIdComponent) : FloatingTooltipComponent {
         context.matrices.push();
         context.matrices.translate(x0 + 3.2f, y0 + 3.2f, 401f);
         context.matrices.scale(0.45f, 0.45f, 1f);
-        mapRenderer.update(mapId, mapState, mapRenderState);    // fixme: 버그 있음
+        mapRenderer.update(mapId, mapState, mapRenderState);
         context.draw { mapRenderer.draw(mapRenderState, context.matrices, it, true, 15728880) };
         context.matrices.pop();
     }

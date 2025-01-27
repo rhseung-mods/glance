@@ -5,12 +5,12 @@ import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.text.Text
 
-class TextComponent(val text: Text, val shift: Int = 0, val theme: TooltipDecor.Theme? = null) : GlanceTooltipComponent {
+class TextComponent(val text: Text, val shiftY: Int = 0, val theme: TooltipDecor.Theme? = null) : GlanceTooltipComponent {
     constructor(text: String) : this(Text.of(text));
     constructor(text: Text): this(text, 0);
 
     fun withTheme(theme: TooltipDecor.Theme): TextComponent {
-        return TextComponent(text, shift, theme);
+        return TextComponent(text, shiftY, theme);
     }
 
     override fun getHeight(textRenderer: TextRenderer): Int {
@@ -33,9 +33,9 @@ class TextComponent(val text: Text, val shift: Int = 0, val theme: TooltipDecor.
     ) {
         if (theme?.title != null) {
             val coloredText = text.copy().withColor(theme.title.toInt());
-            context.drawText(textRenderer, coloredText, x0, y0 + shift, -1, true);
+            context.drawText(textRenderer, coloredText, x0, y0 + shiftY, -1, true);
         }
         else
-            context.drawText(textRenderer, text, x0, y0 + shift, -1, true);
+            context.drawText(textRenderer, text, x0, y0 + shiftY, -1, true);
     }
 }

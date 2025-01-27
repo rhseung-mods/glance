@@ -1,6 +1,5 @@
 package com.rhseung.glance.tooltip.content
 
-import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.ItemStackComponent
 import com.rhseung.glance.tooltip.component.LineComponent
 import com.rhseung.glance.tooltip.component.TextComponent
@@ -43,6 +42,12 @@ class EnchantmentContent(item: Item, itemStack: ItemStack) : GlanceTooltipConten
         }
 
         return ret;
+    }
+
+    override fun getShiftComponents(): List<LineComponent> {
+        return enchantmentEntries.map { (entry, level) ->
+            LineComponent(TextComponent(Enchantment.getName(entry, level)))
+        };
     }
 
     companion object : Factory {

@@ -7,10 +7,12 @@ import net.minecraft.component.DataComponentTypes
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
+import net.minecraft.text.Text
 
-class BundleContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item, itemStack) {
+class BundleContent(item: Item, itemStack: ItemStack) : FloatingTooltipContent(item, itemStack) {
     override fun getComponents(): List<LineComponent> {
         val bundleContent = itemStack.get(DataComponentTypes.BUNDLE_CONTENTS)!!;
+        val customName: Text? = itemStack.get(DataComponentTypes.CUSTOM_NAME);
         val color = when (item) {
             Items.BUNDLE -> -1
             Items.WHITE_BUNDLE -> Color(0xE6E6E6).toInt()
@@ -32,15 +34,21 @@ class BundleContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(ite
             else -> -1
         }
 
-        // todo: bundle
+        val size = bundleContent.size();
+        val maxCol = 9;
+        val row = size / maxCol + if (size % maxCol == 0) 0 else 1;
+
+        // todo: selectedIndex 제한 풀기
+        // todo: size registry, mod support (how?)
+
         return listOf(LineComponent(
             ContainerComponent(
                 bundleContent.stream().toList(),
-                1,
-                9,
+                row,
+                if (row == 1) size else maxCol,
                 color,
                 bundleContent.selectedStackIndex
-            )   // todo: size registry, mod support (how?)
+            ).let { if (customName != null) it.withTitle(customName) else it }
         ));
     }
 

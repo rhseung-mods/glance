@@ -11,20 +11,21 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.item.ItemStack
+import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
 open class ContainerComponent(
     val stacks: List<ItemStack>,
-    val minRow: Int,
-    val maxColumn: Int,
+    val row: Int,
+    val col: Int,
     val color: Int = -1,
     val selectedStackIndex: Int = -1
-) : FloatingTooltipComponent {
+) : GlanceTooltipComponent {
     private val CONTAINER_TEXTURE: Identifier = ModMain.id("textures/gui/container.png");
 
     val size = stacks.size;
-    val row = (size / maxColumn + (size % maxColumn != 0).toInt()).coerceAtLeast(minRow);
-    val col = size.coerceAtMost(maxColumn);
+
+    // todo: scroll 해서 아이템 확인 가능하게 하기
 
     class NineSlice(val u: Int, val v: Int, val width: Int, val height: Int) {
         fun draw(context: DrawContext, texture: Identifier, x: Int, y: Int, color: Int) {
@@ -51,11 +52,15 @@ open class ContainerComponent(
     );
     protected open val background = NineSlice(28, 5, 18, 18);
 
-    override fun getWidthExact(textRenderer: TextRenderer): Int {
+    fun withTitle(title: Text): NamedContainerComponent {
+        return NamedContainerComponent(title, stacks, row, col, color, selectedStackIndex);
+    }
+
+    override fun getWidth(textRenderer: TextRenderer): Int {
         return 5 + 18 * col + 5;
     }
 
-    override fun getHeightExact(textRenderer: TextRenderer): Int {
+    override fun getHeight(textRenderer: TextRenderer): Int {
         return 5 + 18 * row + 5;
     }
 

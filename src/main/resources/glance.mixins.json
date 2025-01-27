@@ -6,6 +6,7 @@
         "hud.PlayerEntityMixin",
         "network.PlayerManagerMixin",
         "network.ServerPlayerEntityMixin",
+        "tooltip.BeehiveBlockMixin",
         "tooltip.EnchantmentMixin",
         "tooltip.ItemStackMixin",
         "tooltip.PotionContentsComponentMixin"
