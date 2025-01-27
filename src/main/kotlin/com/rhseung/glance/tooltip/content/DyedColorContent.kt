@@ -7,15 +7,17 @@ import com.rhseung.glance.util.Color.Companion.with
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.text.Text
 
 class DyedColorContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item, itemStack) {
     override fun getComponents(): List<LineComponent> {
         val dyedColorComponent = itemStack.get(DataComponentTypes.DYED_COLOR)!!;
         val color = Color(dyedColorComponent.rgb);
 
-        // translate
+        val dyedTitle: String = Text.translatable("item.color").string.split(':')[0];
+
         return listOf(LineComponent(
-            TextComponent(("Dyed Color: " with Color.GRAY).append(color.toString() with color))
+            TextComponent(("$dyedTitle: " with Color.GRAY).append(color.toString() with color))
         ));
     }
 

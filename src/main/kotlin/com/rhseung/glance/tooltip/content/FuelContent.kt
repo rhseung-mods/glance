@@ -1,5 +1,6 @@
 package com.rhseung.glance.tooltip.content
 
+import com.rhseung.glance.datagen.LanguageProvider
 import com.rhseung.glance.tooltip.TooltipConstants
 import com.rhseung.glance.tooltip.component.IconComponent
 import com.rhseung.glance.tooltip.component.LineComponent
@@ -12,6 +13,7 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.ingame.AbstractFurnaceScreen
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.text.Text
 
 class FuelContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item, itemStack) {
     private val burnTick = MinecraftClient.getInstance().world!!.fuelRegistry.getFuelTicks(itemStack);
@@ -26,12 +28,8 @@ class FuelContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item,
     }
 
     override fun getShiftComponents(): List<LineComponent> {
-        // translate: "연소: "
         return listOf(LineComponent(
-            TextComponent(("Burn " with Color.GRAY)
-                .append((burnAmount.toStringPretty() + "x") with Color.WHITE)
-                .append(" Item${if (burnAmount == 1f) "" else "s"}" with Color.GRAY)
-            )
+            TextComponent(Text.translatable(LanguageProvider.BURN_AMOUNT, burnAmount.toStringPretty()))
         ));
     }
 

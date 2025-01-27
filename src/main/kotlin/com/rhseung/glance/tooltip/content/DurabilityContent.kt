@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screen.ingame.GrindstoneScreen
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.text.MutableText
+import net.minecraft.text.Text
 
 class DurabilityContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item, itemStack) {
     val durability = itemStack.maxDamage - itemStack.damage;
@@ -29,9 +30,10 @@ class DurabilityContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent
     }
 
     override fun getShiftComponents(): List<LineComponent> {
-        // translate: "내구도: "
+        val durabilityTitle: String = Text.translatable("item.durability").string.split(':')[0];
+
         return listOf(LineComponent(
-            TextComponent(("Durability: " with Color.GRAY).append(durabilityText))
+            TextComponent(("$durabilityTitle: " with Color.GRAY).append(durabilityText))
         ));
     }
 

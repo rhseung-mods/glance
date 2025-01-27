@@ -1,5 +1,6 @@
 package com.rhseung.glance
 
+import com.rhseung.glance.network.ClientSyncHandler
 import com.rhseung.glance.network.ServerSyncHandler
 import com.rhseung.glance.overlay.StackOverlayRegistry
 import com.rhseung.glance.test.GlanceTestItems
@@ -28,7 +29,7 @@ object ModMain : ModInitializer {
 		StackOverlayRegistry.register();
 
 		// network
-		ServerSyncHandler.registerS2CPayloads();
+		ClientSyncHandler.registerC2SPayloads();
 
 		// test
 		GlanceTestItems.init();

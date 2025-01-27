@@ -1,5 +1,6 @@
 package com.rhseung.glance.tooltip.content
 
+import com.rhseung.glance.datagen.TranslatableWord
 import com.rhseung.glance.tooltip.icon.TooltipIcon
 import com.rhseung.glance.tooltip.component.IconComponent
 import com.rhseung.glance.tooltip.component.LineComponent
@@ -81,10 +82,12 @@ class FoodContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item,
     }
 
     override fun getShiftComponents(): List<LineComponent> {
-        // translate: "음식: "
+        val foodText: MutableText = TranslatableWord.FOOD.toText();
+        val saturationText: MutableText = TranslatableWord.SATURATION.toText();
+
         return listOf(
-            LineComponent(TextComponent(("Food: " with Color.GRAY).append(food.toString() with Color.WHITE))),
-            LineComponent(TextComponent(("Saturation: " with Color.GRAY).append(saturation.toStringPretty() with Color.WHITE))),
+            LineComponent(TextComponent((foodText.formatted(Formatting.GRAY)).append(": " with Color.GRAY).append(food.toString() with Color.WHITE))),
+            LineComponent(TextComponent((saturationText.formatted(Formatting.GRAY)).append(": " with Color.GRAY).append(saturation.toStringPretty() with Color.WHITE))),
         );
     }
 

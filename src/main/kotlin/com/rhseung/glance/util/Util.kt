@@ -44,6 +44,12 @@ object Util {
 
     fun Text.toMutableText(): MutableText = this.copy();
 
+    fun String.titlecase(): String {
+        return this.lowercase().split(Regex(" +")).joinToString(" ") {
+            it.split("_").joinToString(" ") { it.replaceFirstChar { it.uppercase() } }
+        };
+    }
+
     fun getStyle(text: Text?): Style? {
         if (text == null)
             return null;

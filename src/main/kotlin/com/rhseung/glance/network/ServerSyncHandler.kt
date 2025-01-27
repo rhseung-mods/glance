@@ -1,6 +1,7 @@
 package com.rhseung.glance.network
 
 import com.rhseung.glance.network.payload.SaturationSyncPayloadS2C
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.server.network.ServerPlayerEntity
 import java.util.*

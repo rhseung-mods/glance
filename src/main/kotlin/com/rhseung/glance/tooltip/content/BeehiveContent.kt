@@ -10,27 +10,28 @@ import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.BlockStateComponent
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.text.Text
 
 class BeehiveContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item, itemStack) {
     override fun getComponents(): List<LineComponent> {
         val beeDatas: List<BeehiveBlockEntity.BeeData> = itemStack.get(DataComponentTypes.BEES)!!;
-        val blockStateComponent: BlockStateComponent = itemStack.getOrDefault(
-            DataComponentTypes.BLOCK_STATE,
-            BlockStateComponent.DEFAULT
-        );
+        val blockStateComponent: BlockStateComponent = itemStack
+            .getOrDefault(DataComponentTypes.BLOCK_STATE, BlockStateComponent.DEFAULT);
 
-        val bees = beeDatas.size;
+        val bees: Int = beeDatas.size;
         val honeyLevel: Int = blockStateComponent.getValue(BeehiveBlock.HONEY_LEVEL) ?: 0;
 
-        // translate
+        val beesTitle: String = Text.translatable("container.beehive.bees").string.split(':')[0];
+        val honeyLevelTitle: String = Text.translatable("container.beehive.honey").string.split(':')[0];
+
         return listOf(
             LineComponent(TextComponent(
-                ("Bees: " with Color.GRAY)
+                ("$beesTitle: " with Color.GRAY)
                     .append(bees.toString() with Color.WHITE)
                     .append("/3" with Color.GRAY)
             )),
             LineComponent(TextComponent(
-                ("Honey: " with Color.GRAY)
+                ("$honeyLevelTitle: " with Color.GRAY)
                     .append(honeyLevel.toString() with Color.WHITE)
                     .append("/5" with Color.GRAY)
             )),
