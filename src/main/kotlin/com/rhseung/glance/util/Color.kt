@@ -102,6 +102,8 @@ class Color {
 
     constructor(rgb: Int) : this((rgb shr 16) and 0xFF, (rgb shr 8) and 0xFF, rgb and 0xFF);
 
+    constructor(str: String) : this(str.substring(1).toInt(16));
+
     fun rgb(): Int {
         return (R shl 16) or (G shl 8) or B;
     }

@@ -1,5 +1,6 @@
 package com.rhseung.glance.tooltip.content
 
+import com.rhseung.glance.ModMain
 import com.rhseung.glance.tooltip.component.ContainerComponent
 import com.rhseung.glance.tooltip.component.LineComponent
 import net.minecraft.block.ShulkerBoxBlock
@@ -14,6 +15,7 @@ class ContainerContent(item: Item, itemStack: ItemStack) : FloatingTooltipConten
     override fun getComponents(): List<LineComponent> {
         val containerComponent = itemStack.get(DataComponentTypes.CONTAINER)!!;
         val customName: Text? = itemStack.get(DataComponentTypes.CUSTOM_NAME);
+        val selectedIndex = itemStack.getOrDefault(ModMain.SELECTED_INDEX, ModMain.SELECTED_INDEX_DEFAULT);
         val color = if (item is BlockItem && item.block is ShulkerBoxBlock)
             (item.block as ShulkerBoxBlock).color?.entityColor ?: -1;
         else
@@ -27,7 +29,8 @@ class ContainerContent(item: Item, itemStack: ItemStack) : FloatingTooltipConten
                 containerComponent.stream().toList(),
                 3,
                 9,
-                color
+                color,
+                selectedIndex
             ).let { if (customName != null) it.withTitle(customName) else it }
         ));
     }

@@ -5,6 +5,7 @@ import com.rhseung.glance.tooltip.TooltipConstants
 import com.rhseung.glance.tooltip.component.IconComponent
 import com.rhseung.glance.tooltip.component.LineComponent
 import com.rhseung.glance.tooltip.component.TextComponent
+import com.rhseung.glance.tooltip.component.XPaddingComponent
 import com.rhseung.glance.util.Color
 import com.rhseung.glance.util.Color.Companion.with
 import com.rhseung.glance.util.Util.toStringPretty
@@ -23,13 +24,15 @@ class FuelContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item,
 
     override fun getComponents(): List<LineComponent> {
         return listOf(LineComponent(
-            IconComponent(TooltipIcon.FUEL), TextComponent(burnAmountText, shiftY = 1)
+            IconComponent(TooltipIcon.FUEL),
+            XPaddingComponent(TooltipConstants.Padding.SPACE),
+            TextComponent(burnAmountText, shiftY = 1)
         ));
     }
 
     override fun getShiftComponents(): List<LineComponent> {
         return listOf(LineComponent(
-            TextComponent(Text.translatable(LanguageProvider.BURN_AMOUNT, burnAmount.toStringPretty()))
+            TextComponent(LanguageProvider.BURN_AMOUNT.getText(burnAmount.toStringPretty()))
         ));
     }
 
