@@ -21,7 +21,6 @@ class ContainerContent(item: Item, itemStack: ItemStack) : FloatingTooltipConten
         else
             DyedColorComponent.getColor(itemStack, -1);
 
-        // todo: selectedIndex 구현
         // todo: size registry, mod support (how?)
 
         return listOf(LineComponent(

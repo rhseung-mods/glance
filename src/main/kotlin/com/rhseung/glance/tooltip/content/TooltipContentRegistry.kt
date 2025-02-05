@@ -30,13 +30,13 @@ object TooltipContentRegistry {
         MapContent.register();
 
         AttributeContent.register();
+        StatusEffectContent.register();
         FoodContent.register();
         ArmorTrimContent.register();
         EnchantmentContent.register();
         DyedColorContent.register();
         FuelContent.register();
         DurabilityContent.register();
-        StatusEffectContent.register();
         BeehiveContent.register();
     }
 }

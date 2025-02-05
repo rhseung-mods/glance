@@ -30,7 +30,6 @@ open class ContainerComponent(
 
     val size = stacks.size;
 
-    // todo: scroll 해서 아이템 확인 가능하게 하기
     class SubmenuHandler(val client: MinecraftClient) : TooltipSubmenuHandler {
         val scroller = Scroller();
 

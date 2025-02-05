@@ -14,42 +14,17 @@ import net.minecraft.item.consume.ApplyEffectsConsumeEffect
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
+import kotlin.collections.plusAssign
 
 class StatusEffectContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(item, itemStack) {
     override fun getComponents(): List<LineComponent> {
         val tickRate: Float = Item.TooltipContext.create(MinecraftClient.getInstance().world).updateTickRate;
+        val effects: List<ApplyEffectsConsumeEffect> = getEffects(itemStack);
+        val effectTexts: MutableList<TextComponent> = getEffectTexts(effects, tickRate).toMutableList();
 
-        val effectTexts: List<TextComponent> = if (itemStack.contains(DataComponentTypes.CONSUMABLE) && itemStack.get(DataComponentTypes.CONSUMABLE)!!.onConsumeEffects.filterIsInstance<ApplyEffectsConsumeEffect>().isNotEmpty()) {
-            val consumableComponent = itemStack.get(DataComponentTypes.CONSUMABLE)!!;
-            val effects: List<ApplyEffectsConsumeEffect> = consumableComponent.onConsumeEffects().filterIsInstance<ApplyEffectsConsumeEffect>();
-
-            getEffectTexts(effects, tickRate);
-        }
-        else if (itemStack.contains(DataComponentTypes.POTION_CONTENTS)) {
-            val potionContentsComponent = itemStack.get(DataComponentTypes.POTION_CONTENTS)!!;
-            val effects: Iterable<StatusEffectInstance> = potionContentsComponent.effects;
-            val noneText = Text.translatable("effect.none").formatted(Formatting.GRAY);
-
-            if (effects.toList().isNotEmpty())
-                getEffectTexts(effects, tickRate);
-            else
-                listOf(TextComponent(noneText));
-        }
-        else if (itemStack.contains(DataComponentTypes.SUSPICIOUS_STEW_EFFECTS)) {  // fixme: 첫 번째 스튜가 saturation만 뜨는데 뭔가 이상함
-            val suspiciousStewEffectsComponent = itemStack.get(DataComponentTypes.SUSPICIOUS_STEW_EFFECTS)!!;
-            val effects: Iterable<StatusEffectInstance> = suspiciousStewEffectsComponent.effects.map { it.createStatusEffectInstance() };
-
-            getEffectTexts(effects, tickRate);
-        }
-        else if (itemStack.contains(DataComponentTypes.OMINOUS_BOTTLE_AMPLIFIER)) {
-            val ominousBottleAmplifierComponent = itemStack.get(DataComponentTypes.OMINOUS_BOTTLE_AMPLIFIER)!!;
-            val effects = listOf(StatusEffectInstance(StatusEffects.BAD_OMEN, 120000, ominousBottleAmplifierComponent.value, false, false, true));
-
-            getEffectTexts(effects, tickRate);
-        }
-        else {
-            return emptyList(); // impossible
-        }
+        val noneText = Text.translatable("effect.none").formatted(Formatting.GRAY);
+        if (effectTexts.isEmpty())
+            effectTexts += TextComponent(noneText);
 
         return effectTexts.map { LineComponent(it) };
     }
@@ -59,7 +34,40 @@ class StatusEffectContent(item: Item, itemStack: ItemStack) : GlanceTooltipConte
     }
 
     companion object : Factory {
-        @JvmName("getEffectTextsFromApplyEffectsConsumeEffect")
+        fun getEffects(itemStack: ItemStack): List<ApplyEffectsConsumeEffect> {
+            val ret = mutableListOf<ApplyEffectsConsumeEffect>();
+
+            if (itemStack.contains(DataComponentTypes.CONSUMABLE)) {
+                val consumableComponent = itemStack.get(DataComponentTypes.CONSUMABLE)!!;
+                val effects: List<ApplyEffectsConsumeEffect> = consumableComponent.onConsumeEffects().filterIsInstance<ApplyEffectsConsumeEffect>();
+
+                ret += effects;
+            }
+
+            if (itemStack.contains(DataComponentTypes.POTION_CONTENTS)) {
+                val potionContentsComponent = itemStack.get(DataComponentTypes.POTION_CONTENTS)!!;
+                val effects: Iterable<StatusEffectInstance> = potionContentsComponent.effects;
+
+                ret += effects.map(::ApplyEffectsConsumeEffect);
+            }
+
+            if (itemStack.contains(DataComponentTypes.SUSPICIOUS_STEW_EFFECTS)) {
+                val suspiciousStewEffectsComponent = itemStack.get(DataComponentTypes.SUSPICIOUS_STEW_EFFECTS)!!;
+                val effects: Iterable<StatusEffectInstance> = suspiciousStewEffectsComponent.effects.map { it.createStatusEffectInstance() };
+
+                ret += effects.map(::ApplyEffectsConsumeEffect);
+            }
+
+            if (itemStack.contains(DataComponentTypes.OMINOUS_BOTTLE_AMPLIFIER)) {
+                val ominousBottleAmplifierComponent = itemStack.get(DataComponentTypes.OMINOUS_BOTTLE_AMPLIFIER)!!;
+                val effects = listOf(StatusEffectInstance(StatusEffects.BAD_OMEN, 120000, ominousBottleAmplifierComponent.value, false, false, true));
+
+                ret += effects.map(::ApplyEffectsConsumeEffect);
+            }
+
+            return ret;
+        }
+
         fun getEffectTexts(consumeEffects: Iterable<ApplyEffectsConsumeEffect>, tickRate: Float): List<TextComponent> {
             val effectTexts = mutableListOf<TextComponent>();
 
@@ -98,11 +106,6 @@ class StatusEffectContent(item: Item, itemStack: ItemStack) : GlanceTooltipConte
             }
 
             return effectTexts;
-        }
-
-        @JvmName("getEffectTextsFromStatusEffectInstance")
-        fun getEffectTexts(effectInstances: Iterable<StatusEffectInstance>, tickRate: Float): List<TextComponent> {
-            return getEffectTexts(effectInstances.map(::ApplyEffectsConsumeEffect), tickRate);
         }
 
         override fun register() {

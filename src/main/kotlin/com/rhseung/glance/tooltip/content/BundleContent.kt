@@ -38,7 +38,6 @@ class BundleContent(item: Item, itemStack: ItemStack) : FloatingTooltipContent(i
         val maxCol = 9;
         val row = size / maxCol + if (size % maxCol == 0) 0 else 1;
 
-        // todo: selectedIndex 제한 풀기
         // todo: size registry, mod support (how?)
 
         return listOf(LineComponent(

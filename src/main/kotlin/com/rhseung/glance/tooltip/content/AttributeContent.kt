@@ -63,60 +63,6 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
         texts[slot]!!.add(text);
     }
 
-    fun defaultAttribute(
-        stack: ItemStack,
-        slot: AttributeModifierSlot,
-        attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
-    ) {
-        val attributeModifiers = stack
-            .getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT);
-
-        attributeModifiers.modifiers.forEach { entry ->
-            if (entry.slot.equals(slot)) {
-                attributeModifierConsumer(entry.attribute, entry.modifier);
-            }
-        }
-    }
-
-    /**
-     * @see net.minecraft.enchantment.EnchantmentHelper.applyAttributeModifiers
-     */
-    fun enchantmentAttribute(
-        stack: ItemStack,
-        slot: AttributeModifierSlot,
-        attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
-    ) {
-        /**
-         * [net.minecraft.enchantment.EnchantmentHelper.forEachEnchantment]
-         */
-        val itemEnchantmentsComponent = stack
-            .getOrDefault(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT);
-
-        itemEnchantmentsComponent.enchantmentEntries.forEach { (enchantment, level) ->
-            enchantment.value().getEffect(EnchantmentEffectComponentTypes.ATTRIBUTES).forEach { effect ->
-                if (enchantment.value().definition().slots().contains(slot)) {
-                    attributeModifierConsumer(effect.attribute(), effect.createAttributeModifier(level, slot));
-                }
-            }
-        }
-    }
-
-    /**
-     * @see net.minecraft.component.type.PotionContentsComponent.buildTooltip
-     */
-    fun potionAttribute(
-        stack: ItemStack,
-        attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
-    ) {
-        val potionContentsComponent = stack
-            .getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
-
-        potionContentsComponent.effects.forEach { effectInstance ->
-            effectInstance.effectType.value()
-                .forEachAttributeModifier(effectInstance.amplifier, attributeModifierConsumer)
-        }
-    }
-
     /**
      * @see net.minecraft.item.ItemStack.appendAttributeModifierTooltip
      */
@@ -290,6 +236,59 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
 
         override fun valid(item: Item, itemStack: ItemStack): Boolean {
             return true;
+        }
+
+        fun defaultAttribute(
+            stack: ItemStack,
+            slot: AttributeModifierSlot,
+            attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
+        ) {
+            val attributeModifiers = stack
+                .getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT);
+
+            attributeModifiers.modifiers.forEach { entry ->
+                if (entry.slot.equals(slot)) {
+                    attributeModifierConsumer(entry.attribute, entry.modifier);
+                }
+            }
+        }
+
+        /**
+         * @see net.minecraft.enchantment.EnchantmentHelper.applyAttributeModifiers
+         */
+        fun enchantmentAttribute(
+            stack: ItemStack,
+            slot: AttributeModifierSlot,
+            attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
+        ) {
+            /**
+             * [net.minecraft.enchantment.EnchantmentHelper.forEachEnchantment]
+             */
+            val itemEnchantmentsComponent = stack
+                .getOrDefault(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT);
+
+            itemEnchantmentsComponent.enchantmentEntries.forEach { (enchantment, level) ->
+                enchantment.value().getEffect(EnchantmentEffectComponentTypes.ATTRIBUTES).forEach { effect ->
+                    if (enchantment.value().definition().slots().contains(slot)) {
+                        attributeModifierConsumer(effect.attribute(), effect.createAttributeModifier(level, slot));
+                    }
+                }
+            }
+        }
+
+        /**
+         * @see net.minecraft.component.type.PotionContentsComponent.buildTooltip
+         */
+        fun potionAttribute(
+            stack: ItemStack,
+            attributeModifierConsumer: (RegistryEntry<EntityAttribute>, EntityAttributeModifier) -> Unit
+        ) {
+            StatusEffectContent.getEffects(stack).forEach { consumeEffect ->
+                consumeEffect.effects.forEach { effectInstance ->
+                    effectInstance.effectType.value()
+                        .forEachAttributeModifier(effectInstance.amplifier, attributeModifierConsumer)
+                }
+            }
         }
     }
 }
