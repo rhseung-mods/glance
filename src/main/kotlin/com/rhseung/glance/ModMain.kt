@@ -2,19 +2,10 @@ package com.rhseung.glance
 
 import com.mojang.serialization.Codec
 import com.rhseung.glance.network.ClientSyncHandler
-import com.rhseung.glance.network.ServerSyncHandler
 import com.rhseung.glance.overlay.StackOverlayRegistry
-import com.rhseung.glance.test.GlanceTestItems
-import com.rhseung.glance.tooltip.content.DurabilityContent
-import com.rhseung.glance.tooltip.content.AttributeContent
-import com.rhseung.glance.tooltip.content.EnchantmentContent
-import com.rhseung.glance.tooltip.content.FoodContent
-import com.rhseung.glance.tooltip.content.FuelContent
-import com.rhseung.glance.tooltip.content.MapContent
 import com.rhseung.glance.tooltip.content.TooltipContentRegistry
 import net.fabricmc.api.ModInitializer
 import net.minecraft.component.ComponentType
-import net.minecraft.network.codec.PacketCodec
 import net.minecraft.network.codec.PacketCodecs
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
@@ -47,8 +38,5 @@ object ModMain : ModInitializer {
 
 		// network
 		ClientSyncHandler.registerC2SPayloads();
-
-		// test
-		GlanceTestItems.init();
 	}
 }
