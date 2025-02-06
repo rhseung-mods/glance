@@ -1,14 +1,13 @@
 package com.rhseung.glance.hud
 
+import com.rhseung.glance.mixin.accessor.InGameHudAccessor
 import com.rhseung.glance.tooltip.icon.HudIcon
-import com.rhseung.glance.util.Util.getProperty
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.random.Random
 import kotlin.math.ceil
 
 object FoodHud {
@@ -22,8 +21,8 @@ object FoodHud {
     fun render(context: DrawContext, player: PlayerEntity, top: Int, right: Int) {
         val textRenderer = MinecraftClient.getInstance().textRenderer;
         val gameHud = MinecraftClient.getInstance().inGameHud;
-        val ticks = gameHud.getProperty<Int>("ticks");
-        val random = gameHud.getProperty<Random>("random");
+        val ticks = (gameHud as InGameHudAccessor).ticks;
+        val random = (gameHud as InGameHudAccessor).random;
 
         val hungerManager = player.hungerManager;
         val foodLevel = hungerManager.foodLevel;

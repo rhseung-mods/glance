@@ -1,6 +1,7 @@
 package com.rhseung.glance.tooltip
 
 import com.mojang.blaze3d.systems.RenderSystem
+import com.rhseung.glance.mixin.accessor.OrderedTextTooltipComponentAccessor
 import com.rhseung.glance.tooltip.TooltipConstants.Padding.TOOLTIP_FRAME_MARGIN
 import com.rhseung.glance.tooltip.component.GlanceTooltipComponent
 import com.rhseung.glance.tooltip.component.LineComponent
@@ -13,7 +14,6 @@ import com.rhseung.glance.tooltip.template.DetailTooltip
 import com.rhseung.glance.tooltip.template.GlanceTooltip
 import com.rhseung.glance.util.Color
 import com.rhseung.glance.util.Util
-import com.rhseung.glance.util.Util.get
 import com.rhseung.glance.util.Util.toRangeSize
 import com.rhseung.glance.util.Util.toText
 import net.minecraft.client.MinecraftClient
@@ -27,7 +27,6 @@ import net.minecraft.client.gui.tooltip.TooltipComponent
 import net.minecraft.client.gui.tooltip.TooltipPositioner
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.item.ItemStack
-import net.minecraft.text.OrderedText
 import net.minecraft.text.Style
 import net.minecraft.text.Text
 
@@ -39,12 +38,10 @@ object Tooltip {
         theme: TooltipDecor.Theme? = null
     ): GlanceTooltip? {
         val originalComponents: List<TooltipComponent> = tooltipComponents.map { component ->
-            if (component is OrderedTextTooltipComponent) {
-                val text: OrderedText = component["text"];
-                return@map TextComponent(text.toText());
-            }
+            if (component is OrderedTextTooltipComponent)
+                TextComponent((component as OrderedTextTooltipComponentAccessor).text.toText());
             else
-                return@map component;
+                component;
         };
 
         val titleStyle: Style? = Util.getStyle((originalComponents[0] as? TextComponent)?.text);

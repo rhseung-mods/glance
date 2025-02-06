@@ -1,14 +1,13 @@
 package com.rhseung.glance.hud
 
+import com.rhseung.glance.mixin.accessor.InGameHudAccessor
 import com.rhseung.glance.tooltip.icon.HudIcon
 import com.rhseung.glance.util.Color
-import com.rhseung.glance.util.Util.getProperty
 import com.rhseung.glance.util.Util.toInt
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.util.math.random.Random
 import kotlin.math.ceil
 
 object HealthHud {
@@ -58,7 +57,7 @@ object HealthHud {
         blinking: Boolean
     ) {
         val gameHud = MinecraftClient.getInstance().inGameHud;
-        val random = gameHud.getProperty<Random>("random");
+        val random = (gameHud as InGameHudAccessor).random;
         val textRenderer = gameHud.textRenderer;
 
         val maxHealth = maxHealth + absorption;

@@ -1,13 +1,12 @@
 package com.rhseung.glance.tooltip.component
 
+import com.rhseung.glance.mixin.accessor.DrawContextAccessor
 import com.rhseung.glance.util.Color
-import com.rhseung.glance.util.Util.getProperty
 import com.rhseung.glance.util.Util.splitToTwo
 import com.rhseung.glance.util.Util.toRangeSize
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
 
 class SeparatorComponent(val color: Color) : GlanceTooltipComponent {
     override fun getWidth(textRenderer: TextRenderer): Int {
@@ -20,7 +19,7 @@ class SeparatorComponent(val color: Color) : GlanceTooltipComponent {
 
     fun fillGradientX(context: DrawContext, startX: Int, startY: Int, endX: Int, endY: Int, colorStart: Int, colorEnd: Int) {
         val matrix4f = context.matrices.peek().positionMatrix;
-        val vertexConsumer = context.getProperty<VertexConsumerProvider.Immediate>("vertexConsumers").getBuffer(RenderLayer.getGui());
+        val vertexConsumer = (context as DrawContextAccessor).vertexConsumers.getBuffer(RenderLayer.getGui());
         vertexConsumer.vertex(matrix4f, startX.toFloat(), startY.toFloat(), 0f).color(colorStart);
         vertexConsumer.vertex(matrix4f, startX.toFloat(), endY.toFloat(), 0f).color(colorStart);
         vertexConsumer.vertex(matrix4f, endX.toFloat(), endY.toFloat(), 0f).color(colorEnd);

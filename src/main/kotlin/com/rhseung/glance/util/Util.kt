@@ -1,7 +1,9 @@
 package com.rhseung.glance.util
 
+import com.rhseung.glance.mixin.accessor.DrawContextAccessor
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.texture.GuiAtlasManager
 import net.minecraft.client.texture.Scaling.Stretch
@@ -89,105 +91,6 @@ object Util {
 
     fun ceilToInt(value: Double) = ceil(value).toInt();
 
-    @Throws(NoSuchFieldException::class)
-    private fun getField(clazz: Class<*>, fieldName: String): Field {
-        return try {
-            clazz.getDeclaredField(fieldName);
-        } catch (e: NoSuchFieldException) {
-            val superClass = clazz.superclass;
-            if (superClass == null) {
-                throw e;
-            } else {
-                getField(superClass, fieldName);
-            }
-        }
-    }
-
-    fun <T> get(receiver: Any, propertyName: String): T {
-        val clazz: Class<*> = receiver.javaClass
-
-        var field: Field? = null
-        try {
-            field = getField(clazz, propertyName)
-        } catch (e: NoSuchFieldException) {
-            throw e
-        }
-
-        field.isAccessible = true
-
-        return try {
-            @Suppress("UNCHECKED_CAST")
-            field[receiver] as T
-        } catch (e: IllegalAccessException) {
-            throw e
-        } catch (e: ClassCastException) {
-            throw e
-        }
-    }
-
-    fun <T> Any.getProperty(propertyName: String): T {
-        return get(this, propertyName);
-    }
-
-    @JvmName("getOperator")
-    operator fun <T> Any.get(propertyName: String): T {
-        return getProperty<T>(propertyName);
-    }
-
-    @Throws(NoSuchMethodException::class)
-    private fun getMethod(clazz: Class<*>, methodName: String, vararg parameterTypes: Class<*>): Method {
-        val methods = clazz.declaredMethods.filter { it.name == methodName && it.parameterCount == parameterTypes.size };
-
-        if (methods.isEmpty()) {
-            val superClass = clazz.superclass;
-            if (superClass == null)
-                throw NoSuchMethodException();
-            else
-                return getMethod(superClass, methodName, *parameterTypes);
-        }
-
-        if (methods.size == 1)
-            return methods[0];
-
-        for (method in methods) {
-            if (method.parameterTypes.contentEquals(parameterTypes))
-                return method;
-        }
-
-        throw NoSuchMethodException();
-    }
-
-    fun <T> invoke(receiver: Any, methodName: String, vararg args: Any?): T {
-        val clazz: Class<*> = receiver.javaClass
-
-        // Determine the parameter types of the method
-        val parameterTypes = args.map { it?.javaClass ?: Any::class.java }.toTypedArray()
-
-        val method: Method
-        try {
-            method = getMethod(clazz, methodName, *parameterTypes)
-        } catch (e: NoSuchMethodException) {
-            throw e
-        }
-
-        method.isAccessible = true
-
-        return try {
-            @Suppress("UNCHECKED_CAST")
-            method.invoke(receiver, *args) as T
-        } catch (e: IllegalAccessException) {
-            throw e
-        } catch (e: ClassCastException) {
-            throw e
-        } catch (e: java.lang.reflect.InvocationTargetException) {
-            throw e.targetException
-        }
-    }
-
-    fun <T> Any.invokeMethod(methodName: String, vararg args: Any?): T {
-        return invoke(this, methodName, *args)
-    }
-
     fun OrderedText.toText(): Text {
         val mutableTextArr = mutableListOf(Text.empty());
         this.accept { idx, style, c ->
@@ -210,14 +113,14 @@ object Util {
         height: Int,
         color: Int
     ) {
-        val guiAtlasManager = this.getProperty<GuiAtlasManager>("guiAtlasManager");
+        val guiAtlasManager = (this as DrawContextAccessor).guiAtlasManager;
         val sprite2 = guiAtlasManager.getSprite(sprite);
         val scaling = guiAtlasManager.getScaling(sprite2);
 
         if (scaling is Stretch)
-            this.invokeMethod<Unit>("drawSpriteRegion", renderLayers, sprite2, textureWidth, textureHeight, u, v, x, y, width, height, color);
+            (this as DrawContextAccessor).drawSpriteRegionMixin(renderLayers, sprite2, textureWidth, textureHeight, u, v, x, y, width, height, color);
         else
-            this.invokeMethod<Unit>("drawSpriteStretched", renderLayers, sprite2, x, y, width, height, color);
+            (this as DrawContextAccessor).drawSpriteStretchedMixin(renderLayers, sprite2, x, y, width, height, color);
     }
 
     fun DrawContext.drawGuiTextureFloat(
@@ -229,7 +132,7 @@ object Util {
         height: Float,
         color: Int = -1
     ) {
-        val guiAtlasManager = this.getProperty<GuiAtlasManager>("guiAtlasManager");
+        val guiAtlasManager = (this as DrawContextAccessor).guiAtlasManager;
         val sprite: Sprite = guiAtlasManager.getSprite(sprite);
 
         val d: Float = 0b1 / 32768f;
@@ -250,7 +153,7 @@ object Util {
         height: Float,
         color: Int = -1
     ) {
-        val guiAtlasManager = this.getProperty<GuiAtlasManager>("guiAtlasManager");
+        val guiAtlasManager = (this as DrawContextAccessor).guiAtlasManager;
         val sprite: Sprite = guiAtlasManager.getSprite(sprite);
 
         val d: Float = 0b1 / 32768f;
@@ -286,7 +189,7 @@ object Util {
     ) {
         val renderLayer: RenderLayer = renderLayers.apply(texture);
         val matrix: Matrix4f = this.matrices.peek().positionMatrix;
-        val vertexConsumer = this.getProperty<VertexConsumerProvider.Immediate>("vertexConsumers").getBuffer(renderLayer);
+        val vertexConsumer: VertexConsumer = (this as DrawContextAccessor).vertexConsumers.getBuffer(renderLayer);
 
         vertexConsumer.vertex(matrix, x1, y1, 0f).texture(u1, v1).color(color);
         vertexConsumer.vertex(matrix, x1, y2, 0f).texture(u1, v2).color(color);

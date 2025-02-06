@@ -16,6 +16,9 @@
         "defaultRequire": 1
     },
     "client": [
+        "accessor.DrawContextAccessor",
+        "accessor.InGameHudAccessor",
+        "accessor.OrderedTextTooltipComponentAccessor",
         "hud.HandledScreenMixin",
         "hud.InGameHudMixin",
         "hud.MinecraftClientMixin",
@@ -24,6 +27,7 @@
         "tooltip.BundleItemMixin",
         "tooltip.DrawContextMixin",
         "tooltip.HandledScreenMixin",
-        "tooltip.OrderedTextTooltipComponentMixin"
+        "tooltip.OrderedTextTooltipComponentMixin",
+        "tooltip.TooltipComponentMixin"
     ]
 }
