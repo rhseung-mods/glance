@@ -9,7 +9,8 @@
 	],
 	"contact": {
 		"homepage": "https://modrinth.com/mod/glance",
-		"sources": "https://github.com/rhseung-mods/glance"
+		"sources": "https://github.com/rhseung-mods/glance",
+		"issues": "https://github.com/rhseung-mods/glance/issues"
 	},
 	"license": "MIT",
 	"icon": "assets/glance/glance.png",

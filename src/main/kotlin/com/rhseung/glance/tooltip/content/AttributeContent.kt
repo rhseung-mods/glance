@@ -188,7 +188,7 @@ class AttributeContent(item: Item, itemStack: ItemStack) : GlanceTooltipContent(
                 line.addAll(0, LineComponent(
                     IconComponent(slot.toIcon()),
                     XPaddingComponent(SPACE),
-                    TextComponent(">"),
+                    TextComponent(">", shiftY = 1),
                     XPaddingComponent(SLOT_MARGIN),
                 ))
             };

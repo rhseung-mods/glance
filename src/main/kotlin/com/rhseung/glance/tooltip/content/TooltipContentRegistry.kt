@@ -30,8 +30,8 @@ object TooltipContentRegistry {
         MapContent.register();
 
         AttributeContent.register();
-        StatusEffectContent.register();
         FoodContent.register();
+        StatusEffectContent.register();
         ArmorTrimContent.register();
         EnchantmentContent.register();
         DyedColorContent.register();

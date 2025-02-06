@@ -37,7 +37,7 @@ class AttributeIcon(
         val EXPLOSION_KNOCKBACK_RESISTANCE = AttributeIcon("explosion_knockback_resistance", EntityAttributes.EXPLOSION_KNOCKBACK_RESISTANCE);
         val KNOCKBACK_RESISTANCE = AttributeIcon("knockback_resistance", EntityAttributes.KNOCKBACK_RESISTANCE);
         val LUCK = AttributeIcon("luck", EntityAttributes.LUCK);
-        val MAX_HEALTH = AttributeIcon("max_health", EntityAttributes.MAX_HEALTH);
+        val MAX_ABSORPTION = AttributeIcon("max_absorption", EntityAttributes.MAX_ABSORPTION);
         val MINING_EFFICIENCY = AttributeIcon("mining_efficiency", EntityAttributes.MINING_EFFICIENCY);
         val MOVEMENT_SPEED = AttributeIcon("movement_speed", EntityAttributes.MOVEMENT_SPEED);
         val OXYGEN_BONUS = AttributeIcon("oxygen_bonus", EntityAttributes.OXYGEN_BONUS);

@@ -50,7 +50,7 @@ object TooltipDecor {
         val RARE = Theme(Color.AQUA);
         val EPIC = Theme(Color.LIGHT_PURPLE);
 
-        val MUSIC = Theme(Color.WHITE, Color.WHITE, cosmetic = id("music"));
+        val MUSIC = Theme(Color.WHITE, cosmetic = id("music"));
         val ENCHANT = Theme(Color(0x8B4513), Color(0x723510), Color(0xEB9A5E), id("enchant"));
         val MAP = Theme(Color(0xD6BE96));
 

@@ -6,8 +6,10 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.text.Text
 
 class TextComponent(val text: Text, val shiftY: Int = 0, val theme: TooltipDecor.Theme? = null) : GlanceTooltipComponent {
-    constructor(text: String) : this(Text.of(text));
-    constructor(text: Text): this(text, 0);
+    constructor(text: String, shiftY: Int = 0, theme: TooltipDecor.Theme? = null)
+        : this(Text.of(text), shiftY, theme);
+    constructor(text: Text)
+        : this(text, 0);
 
     fun withTheme(theme: TooltipDecor.Theme): TextComponent {
         return TextComponent(text, shiftY, theme);

@@ -68,7 +68,7 @@ object Tooltip {
 
         if (stack != null) {
             val contents = TooltipContentRegistry.find(stack.item, stack);
-            val contentsComponents = mutableListOf<GlanceTooltipComponent>();
+            var contentsComponents = mutableListOf<GlanceTooltipComponent>();
 
             contents.forEach { content ->
                 val eachComponents: List<LineComponent> = if (isDetail) content.getShiftComponents() else content.getComponents();
@@ -82,9 +82,14 @@ object Tooltip {
                             contentsComponents.add(YPaddingComponent(8));
 
                         contentsComponents.addAll(eachComponents);
+
+                        if (eachComponents.size > 1 && !isDetail)
+                            contentsComponents.add(YPaddingComponent(8));
                     }
                 }
             };
+
+            contentsComponents = contentsComponents.dropLastWhile { it is YPaddingComponent }.toMutableList();
 
             if (contentsComponents.isNotEmpty()) {
                 if (isDetail) {
@@ -367,7 +372,7 @@ object Tooltip {
 
         context.matrices.push();
         context.matrices.translate(0f, 0f, z.toFloat());
-        tooltip.draw(context, textRenderer, innerX.first, innerY.first, x, y);
+        tooltip.drawInner(context, textRenderer, innerX.first, innerY.first, x, y);
         context.matrices.pop();
     }
 }

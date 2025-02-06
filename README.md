@@ -67,13 +67,13 @@ Shows overlays for beehives based on their honey level.
 
 - Changes tooltip appearances based on disc, enchanted book, and rarity.
 
-  ![Disc](https://cdn.modrinth.com/data/cached_images/a26f24f9abd2c23ddbdcb9c9ec5ba71a37ac9723.png)  
+  ![Disc](https://cdn.modrinth.com/data/cached_images/82792cd3757666ab866ec44231695344a43bc759.png)  
   ![Enchanted Book](https://cdn.modrinth.com/data/cached_images/4354bc76aa0c0b4c0e06d37b576c7f39d1466055.png)
 
 - Simplifies and makes tooltips more intuitive by using icons.
 
   ![Simple Icon Tooltip](https://cdn.modrinth.com/data/cached_images/7ee3b6c11fb6cdf33754f162ac4df897bbb6ac3a.png)  
-  ![Complex Icon Tooltip](https://cdn.modrinth.com/data/cached_images/6cf72d06f3adcea6c1a54cd7f6888c62cdb89780.png)
+  ![Complex Icon Tooltip](https://cdn.modrinth.com/data/cached_images/3253b8a683ad7730ff76908818df7d1145718046.png)
 
 - Displays detailed text tooltips when holding **Shift**.
 

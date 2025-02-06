@@ -23,7 +23,7 @@ abstract class GlanceTooltip(
         return tooltip.sumOf { it.getHeight(textRenderer) };
     }
 
-    fun draw(context: DrawContext, textRenderer: TextRenderer, x0: Int, y0: Int, outerX: Int, outerY: Int) {
+    fun drawInner(context: DrawContext, textRenderer: TextRenderer, x0: Int, y0: Int, outerX: Int, outerY: Int) {
         var x = x0;
         var y = y0;
 
